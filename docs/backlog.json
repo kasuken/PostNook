@@ -1,0 +1,485 @@
+{
+  "version": 1,
+  "prdVersion": "1.0",
+  "targetRelease": "v0.1.0",
+  "items": [
+    {
+      "key": "E00",
+      "title": "[E00] Technical Foundation",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E00 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nDerived from Sprint 0 and sections 8-11, 15-16. Establish the project and validate the browser, storage, editor, Markdown, and output assumptions before feature implementation.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "E01",
+      "title": "[E01] Browser Extension Foundation",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E01 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPRD feature epic: open and restore the native side panel in supported Chrome and Edge versions without website access.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "E02",
+      "title": "[E02] Writing Editor",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E02 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPRD feature epic: provide the supported Tiptap document schema, editing interactions, and accessible formatting toolbar.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "E03",
+      "title": "[E03] Markdown and Smart Paste",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E03 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPRD feature epic: import supported Markdown and safely normalize pasted content while preserving existing work.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "E04",
+      "title": "[E04] LinkedIn Output",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E04 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPRD feature epic: generate deterministic publishing text, estimate output length, and copy through an explicit user action.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "E05",
+      "title": "[E05] Draft Management",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E05 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPRD feature epic: protect committed content with transactional storage, autosave, revision conflict handling, and multiple drafts.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "E06",
+      "title": "[E06] Preview",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E06 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPRD feature epic: show desktop and mobile presentations of the same serialized text used for clipboard output.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "E07",
+      "title": "[E07] Settings and Accessibility",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E07 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPRD feature epic: persist themes and output preferences, and provide an accessible side-panel interface.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "E08",
+      "title": "[E08] Quality, Security, and Compatibility",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E08 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nDerived from sections 3.3, 7, 12-14, 17-19. Verify reliability, security, accessibility, performance, and browser and manual LinkedIn compatibility.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "E09",
+      "title": "[E09] Delivery, Documentation, and Release",
+      "kind": "epic",
+      "parent": null,
+      "sprint": null,
+      "points": null,
+      "body": "<!-- postnook:E09 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nDerived from sections 2, 12, 15-18, 22. Produce CI and release packaging, user and engineering documentation, store materials, and release evidence.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n"
+    },
+    {
+      "key": "US-001",
+      "title": "[US-001] Open PostNook from the Browser",
+      "kind": "story",
+      "parent": "E01",
+      "sprint": 0,
+      "points": 3,
+      "body": "<!-- postnook:US-001 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **0**. Story points: **3** (from PRD).\n\nPriority: P0\nStory points: 3\n\n**User Story**\n\nAs a browser user, I want to open PostNook from the extension toolbar so that I can write without leaving my current website.\n\n**Acceptance Criteria**\n\n- [ ] AC-001.1: Clicking the PostNook icon opens the native browser side panel.\n- [ ] AC-001.2: The panel can open when LinkedIn is active.\n- [ ] AC-001.3: The panel also works when another website is active.\n- [ ] AC-001.4: Closing the panel does not delete stored drafts.\n- [ ] AC-001.5: Reopening the panel restores the previous active draft.\n- [ ] AC-001.6: No website access permission is required.\n- [ ] AC-001.7: The application displays a usable state when no drafts exist.\n- [ ] AC-001.8: Browser API initialization errors display a recoverable error state.\n\n**Technical Notes**\n\nUse:\n\n* Manifest V3.\n* chrome.sidePanel.\n* Global side_panel.default_path.\n* Extension action icon.\n* chrome.sidePanel.setPanelBehavior() to enable opening through the action icon.\n\nA background service worker may be used for extension initialization but must not own draft editing state.\n\nThe Chrome target is version 116 or later. Edge compatibility must be validated against the same required APIs.\n\n**Definition of Done**\n\nThe extension opens successfully on the supported versions of Chrome and Edge and requires no LinkedIn-specific permissions.\n\n\n## Dependencies\n\nTF-001, TF-002 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-001",
+        "TF-002"
+      ]
+    },
+    {
+      "key": "US-002",
+      "title": "[US-002] Create and Edit a Post",
+      "kind": "story",
+      "parent": "E02",
+      "sprint": 1,
+      "points": 5,
+      "body": "<!-- postnook:US-002 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **1**. Story points: **5** (from PRD).\n\nPriority: P0\nStory points: 5\n\n**User Story**\n\nAs a writer, I want a comfortable editing environment so that I can create LinkedIn posts without fighting the native composer.\n\n**Acceptance Criteria**\n\n- [ ] AC-002.1: Users can create a new document.\n- [ ] AC-002.2: Users can type, select, delete, and replace text.\n- [ ] AC-002.3: Enter creates a new paragraph.\n- [ ] AC-002.4: Shift+Enter inserts a line break within the paragraph.\n- [ ] AC-002.5: Ctrl/Cmd+Z performs undo.\n- [ ] AC-002.6: Ctrl/Cmd+Shift+Z performs redo.\n- [ ] AC-002.7: Ctrl/Cmd+B toggles bold on the selection.\n- [ ] AC-002.8: Ctrl/Cmd+I toggles italic on the selection.\n- [ ] AC-002.9: Cursor location remains stable when applying formatting.\n- [ ] AC-002.10: The editor works with empty and long documents.\n- [ ] AC-002.11: User content is never replaced silently when parsing fails.\n- [ ] AC-002.12: Unsupported pasted elements are converted to text or supported nodes.\n\n**Supported Document Elements**\n\n* Paragraph.\n* Hard line break.\n* Text.\n* Bold mark.\n* Italic mark.\n* Bullet list.\n* Ordered list.\n* List item.\n\nHeadings, tables, code blocks, images, embedded media, and arbitrary HTML elements are not native v0.1 document types.\n\n**Technical Notes**\n\nUse Tiptap with a minimal extension configuration.\n\nDisable unnecessary StarterKit features rather than exposing formatting that cannot be represented in the LinkedIn output.\n\nStore the structured document as Tiptap-compatible JSON.\n\n\n## Dependencies\n\nTF-001, TF-005 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-001",
+        "TF-005"
+      ]
+    },
+    {
+      "key": "US-003",
+      "title": "[US-003] Format Text",
+      "kind": "story",
+      "parent": "E02",
+      "sprint": 1,
+      "points": 3,
+      "body": "<!-- postnook:US-003 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **1**. Story points: **3** (from PRD).\n\nPriority: P0\nStory points: 3\n\n**User Story**\n\nAs a writer, I want a compact toolbar so that I can structure my content without memorizing formatting syntax.\n\n**Acceptance Criteria**\n\n- [ ] AC-003.1: Toolbar provides bold, italic, bullet list, and numbered list controls.\n- [ ] AC-003.2: Toolbar provides undo and redo.\n- [ ] AC-003.3: Toolbar provides clear-formatting functionality.\n- [ ] AC-003.4: Active formatting is visually indicated.\n- [ ] AC-003.5: Disabled commands are visually and programmatically disabled.\n- [ ] AC-003.6: Formatting commands are keyboard-accessible.\n- [ ] AC-003.7: Applying formatting does not lose the current selection.\n- [ ] AC-003.8: The editor explains that internal formatting may differ from published LinkedIn text.\n\n**Important Behavior**\n\nBold and italic are stored as editor marks.\n\nIn the default plain-text output mode, those marks do not generate Unicode styling and are not represented as visible Markdown markers.\n\nUsers must select the optional Unicode output mode if they want compatible characters visually transformed.\n\nThe preview always shows the output generated for the currently selected mode.\n\n\n## Dependencies\n\nUS-002 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-002"
+      ]
+    },
+    {
+      "key": "US-004",
+      "title": "[US-004] Import Markdown",
+      "kind": "story",
+      "parent": "E03",
+      "sprint": 1,
+      "points": 5,
+      "body": "<!-- postnook:US-004 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **1**. Story points: **5** (from PRD).\n\nPriority: P0\nStory points: 5\n\n**User Story**\n\nAs a technical content creator, I want to import Markdown so that I can reuse content written in development tools.\n\n**Supported Syntax**\n\n| Markdown | Editor Representation |\n| --- | --- |\n| Paragraphs | Paragraphs |\n| **bold** | Bold mark |\n| *italic* | Italic mark |\n| - item | Bullet list |\n| 1. item | Numbered list |\n| Line breaks | Paragraph or hard break according to parser rules |\n\n**Acceptance Criteria**\n\n- [ ] AC-004.1: A Paste as Markdown action is available.\n- [ ] AC-004.2: Supported Markdown converts to structured editor content.\n- [ ] AC-004.3: Normal paste does not automatically interpret every Markdown-looking string.\n- [ ] AC-004.4: Unsupported Markdown is preserved as readable text where possible.\n- [ ] AC-004.5: Parsing failures do not remove the user’s existing content.\n- [ ] AC-004.6: Imported text remains editable.\n- [ ] AC-004.7: Markdown import and output generation are covered by unit tests.\n- [ ] AC-004.8: Importing Markdown never executes HTML, scripts, or embedded instructions.\n\n**Technical Decision**\n\nTiptap’s Markdown extension is beta.\n\nPlace Markdown conversion behind a dedicated adapter interface so the implementation can be replaced if necessary.\n\nPersist editor JSON rather than Markdown strings.\n\n\n## Dependencies\n\nUS-002, TF-006 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-002",
+        "TF-006"
+      ]
+    },
+    {
+      "key": "US-005",
+      "title": "[US-005] Smart Paste",
+      "kind": "story",
+      "parent": "E03",
+      "sprint": 1,
+      "points": 5,
+      "body": "<!-- postnook:US-005 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **1**. Story points: **5** (from PRD).\n\nPriority: P0\nStory points: 5\n\n**User Story**\n\nAs a writer, I want pasted content cleaned automatically so that I don’t waste time fixing formatting from other applications.\n\n**Expected Sources**\n\n* ChatGPT.\n* Microsoft Word.\n* Google Docs.\n* Notion.\n* VS Code.\n* Plain-text editors.\n\n**Acceptance Criteria**\n\n- [ ] AC-005.1: Normal paste accepts text/plain.\n- [ ] AC-005.2: When suitable text/html is available, supported semantic formatting may be retained.\n- [ ] AC-005.3: Dangerous markup is removed.\n- [ ] AC-005.4: Script elements and event attributes are never executed.\n- [ ] AC-005.5: Paragraph boundaries are retained where possible.\n- [ ] AC-005.6: Non-breaking spaces are normalized when appropriate.\n- [ ] AC-005.7: Emoji and non-Latin characters are preserved.\n- [ ] AC-005.8: Pasting unsupported tables produces readable text rather than silently dropping content.\n- [ ] AC-005.9: Users can undo the paste operation.\n- [ ] AC-005.10: Clipboard read errors display a useful message without damaging the existing document.\n\n**Processing Rules**\n\n1. Read clipboard data from the user-initiated paste event.\n2. Prefer supported semantic structure when safe.\n3. Sanitize source HTML.\n4. Convert supported elements to Tiptap nodes.\n5. Normalize unsupported structure.\n6. Insert the result at the current selection.\n7. Trigger autosave.\n\nNever access the clipboard continuously in the background.\n\n\n## Dependencies\n\nUS-002 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-002"
+      ]
+    },
+    {
+      "key": "US-006",
+      "title": "[US-006] Generate Publishing Text",
+      "kind": "story",
+      "parent": "E04",
+      "sprint": 1,
+      "points": 5,
+      "body": "<!-- postnook:US-006 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **1**. Story points: **5** (from PRD).\n\nPriority: P0\nStory points: 5\n\n**User Story**\n\nAs a writer, I want PostNook to generate text suitable for LinkedIn so that I can paste my content without manually restructuring it.\n\n**Output Modes**\n\nMode 1: Plain Text\n\nDefault and required for MVP.\n\nMode 2: Unicode Styling\n\nOptional, with an accessibility warning.\n\nRich HTML clipboard output is excluded from the supported MVP. It can be evaluated separately after compatibility testing.\n\n**Plain-Text Serialization Rules**\n\n* Paragraphs are separated by two newline characters.\n* Hard breaks become one newline.\n* Bullet items begin with • .\n* Numbered items begin with sequential 1. , 2. , etc.\n* List items are separated by single newlines.\n* Paragraph-to-list transitions use one blank line.\n* Leading and trailing empty paragraphs are trimmed.\n* Accidental excessive empty paragraphs are normalized to a maximum of one blank line in generated output.\n* URLs, hashtags, mentions, and emojis remain ordinary text.\n* Internal bold and italic marks are ignored in plain output.\n* No Markdown markers are added unless they were entered as literal text.\n\n**Unicode Styling Rules**\n\n* Only explicitly marked bold or italic text is transformed.\n* Unsupported characters remain unchanged.\n* URLs, hashtags, and mentions are not transformed.\n* The user receives a warning about readability and accessibility.\n* The preview reflects transformed characters.\n* The character counter recalculates after transformation.\n* Users can return to plain-text mode without changing the underlying document.\n\n**Acceptance Criteria**\n\n- [ ] AC-006.1: The same document and output mode generate deterministic text.\n- [ ] AC-006.2: Empty content produces an empty output string.\n- [ ] AC-006.3: Basic paragraphs retain their intended spacing.\n- [ ] AC-006.4: Lists are readable after pasting.\n- [ ] AC-006.5: Emoji and international characters are preserved.\n- [ ] AC-006.6: Generated text contains no unexpected HTML tags.\n- [ ] AC-006.7: The preview and clipboard use the same serialization service.\n- [ ] AC-006.8: Changing output mode never changes the stored editor document.\n- [ ] AC-006.9: Malformed or unsupported internal nodes fail safely.\n- [ ] AC-006.10: No automatic LinkedIn page interaction occurs.\n\n**Implementation Requirement**\n\nUse a pure output function equivalent to:\n\nserializePost(document, outputMode) -> string\n\nThis service must have no dependency on React, browser extension APIs, or LinkedIn.\n\n\n## Dependencies\n\nTF-005, TF-006 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-005",
+        "TF-006"
+      ]
+    },
+    {
+      "key": "US-007",
+      "title": "[US-007] Character Counter",
+      "kind": "story",
+      "parent": "E04",
+      "sprint": 1,
+      "points": 2,
+      "body": "<!-- postnook:US-007 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **1**. Story points: **2** (from PRD).\n\nPriority: P0\nStory points: 2\n\n**User Story**\n\nAs a writer, I want to see the estimated length of my finished post so that I can avoid exceeding LinkedIn’s posting limit.\n\n**Acceptance Criteria**\n\n- [ ] AC-007.1: Counter updates when content changes.\n- [ ] AC-007.2: Counter uses serialized output, not raw editor JSON.\n- [ ] AC-007.3: LinkedIn’s current 3,000-character limit is displayed.\n- [ ] AC-007.4: A warning appears when the estimated count approaches the limit.\n- [ ] AC-007.5: A clear error state appears when the estimate exceeds 3,000.\n- [ ] AC-007.6: Unicode formatting changes trigger recounting.\n- [ ] AC-007.7: Over-limit content can still be edited and saved.\n- [ ] AC-007.8: Copying over-limit content requires an explicit warning but is not silently blocked.\n\n**Technical Note**\n\nInitially use UTF-16 code-unit length as a conservative estimate.\n\nLinkedIn’s exact handling of Unicode sequences must be checked against actual publishing behavior.\n\nDo not describe the count as an exact platform guarantee until validated.\n\n\n## Dependencies\n\nUS-006 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-006"
+      ]
+    },
+    {
+      "key": "US-008",
+      "title": "[US-008] Copy Post",
+      "kind": "story",
+      "parent": "E04",
+      "sprint": 2,
+      "points": 3,
+      "body": "<!-- postnook:US-008 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **2**. Story points: **3** (from PRD).\n\nPriority: P0\nStory points: 3\n\n**User Story**\n\nAs a writer, I want to copy my completed post with one click so that I can publish it manually.\n\n**Acceptance Criteria**\n\n- [ ] AC-008.1: Copy Post is available in the editor.\n- [ ] AC-008.2: Clicking it copies generated output, not editor HTML.\n- [ ] AC-008.3: It uses the user-triggered browser Clipboard API.\n- [ ] AC-008.4: Successful copying displays confirmation.\n- [ ] AC-008.5: A clipboard failure displays an actionable error.\n- [ ] AC-008.6: Copy does not clear the editor.\n- [ ] AC-008.7: Copy does not change the current draft.\n- [ ] AC-008.8: The last copied timestamp is stored only after a successful copy.\n- [ ] AC-008.9: Empty drafts cannot trigger a misleading success message.\n- [ ] AC-008.10: No LinkedIn API calls or DOM manipulation occur.\n\n**Technical Notes**\n\nUse navigator.clipboard.writeText() from a direct user interaction.\n\nPrototype clipboard permissions on both browsers before adding extra manifest permissions.\n\nIf the operation is unavailable, provide a manual select-and-copy fallback.\n\n\n## Dependencies\n\nUS-006, US-007, US-009, TF-003 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-006",
+        "US-007",
+        "US-009",
+        "TF-003"
+      ]
+    },
+    {
+      "key": "US-009",
+      "title": "[US-009] Automatically Save Drafts",
+      "kind": "story",
+      "parent": "E05",
+      "sprint": 2,
+      "points": 8,
+      "body": "<!-- postnook:US-009 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **2**. Story points: **8** (from PRD).\n\nPriority: P0\nStory points: 8\n\n**User Story**\n\nAs a writer, I want my work saved automatically so that I can return to it after closing the browser or experiencing interruptions.\n\n**Acceptance Criteria**\n\n- [ ] AC-009.1: A new draft receives a unique identifier.\n- [ ] AC-009.2: Changes are persisted to IndexedDB.\n- [ ] AC-009.3: Autosave is debounced to reduce excessive writes.\n- [ ] AC-009.4: Continuous typing triggers periodic persistence.\n- [ ] AC-009.5: Save status is visible.\n- [ ] AC-009.6: Successfully persisted content survives reopening the browser.\n- [ ] AC-009.7: Storage failures are reported instead of silently ignored.\n- [ ] AC-009.8: Pending writes are flushed where possible when focus is lost or the panel closes.\n- [ ] AC-009.9: Saving uses transactions that avoid partial document writes.\n- [ ] AC-009.10: A second open panel must not silently overwrite newer changes from another browser window.\n- [ ] AC-009.11: A schema migration preserves existing draft content.\n\n**Autosave Defaults**\n\n* Debounce: 300 milliseconds.\n* Maximum wait during continuous typing: 1,500 milliseconds.\n* Save on explicit draft switching.\n* Attempt to flush pending changes on visibility change.\n* Reconcile storage revision conflicts.\n\nA crash can still lose edits that have not yet committed. The product must never falsely claim that uncommitted edits were saved.\n\n**Save States**\n\n* Saved\n* Saving\n* Unsaved changes\n* Save failed\n* Storage unavailable\n\n**Error Handling**\n\nOn a storage error:\n\n1. Keep unsaved content in the active editor.\n2. Display a persistent error state.\n3. Offer retry.\n4. Avoid changing the displayed state to Saved until persistence succeeds.\n5. Warn users before actions that could discard the unsaved content.\n\n\n## Dependencies\n\nTF-004 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-004"
+      ]
+    },
+    {
+      "key": "US-010",
+      "title": "[US-010] Manage Multiple Drafts",
+      "kind": "story",
+      "parent": "E05",
+      "sprint": 2,
+      "points": 5,
+      "body": "<!-- postnook:US-010 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **2**. Story points: **5** (from PRD).\n\nPriority: P0\nStory points: 5\n\n**User Story**\n\nAs a writer, I want multiple drafts so that I can prepare different posts independently.\n\n**Acceptance Criteria**\n\n- [ ] AC-010.1: Users can create a draft.\n- [ ] AC-010.2: Users can rename a draft.\n- [ ] AC-010.3: Users can switch between drafts.\n- [ ] AC-010.4: Users can delete a draft.\n- [ ] AC-010.5: Deleting requires confirmation.\n- [ ] AC-010.6: Drafts are sorted by last modification time.\n- [ ] AC-010.7: The last active draft is restored on reopening.\n- [ ] AC-010.8: Switching drafts saves the current draft first.\n- [ ] AC-010.9: Empty-state messaging appears when no drafts exist.\n- [ ] AC-010.10: If a draft cannot be loaded, users see an error instead of a blank replacement document.\n\n**UI Requirements**\n\nDraft selector displays:\n\n* Draft title.\n* Last modified timestamp.\n* Current active state.\n\n**Default Title**\n\nUse Untitled Post until renamed.\n\nThe editor must not automatically overwrite a user-defined title.\n\n\n## Dependencies\n\nUS-009 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-009"
+      ]
+    },
+    {
+      "key": "US-011",
+      "title": "[US-011] Preview the Finished Post",
+      "kind": "story",
+      "parent": "E06",
+      "sprint": 2,
+      "points": 5,
+      "body": "<!-- postnook:US-011 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **2**. Story points: **5** (from PRD).\n\nPriority: P0\nStory points: 5\n\n**User Story**\n\nAs a writer, I want to preview my post so that I can inspect the content before publishing.\n\n**Acceptance Criteria**\n\n- [ ] AC-011.1: Users can open preview mode.\n- [ ] AC-011.2: Users can select desktop or mobile presentation.\n- [ ] AC-011.3: Preview uses the generated output.\n- [ ] AC-011.4: Paragraph and list spacing matches output serialization.\n- [ ] AC-011.5: Unicode styling appears only when selected.\n- [ ] AC-011.6: Long content remains scrollable.\n- [ ] AC-011.7: Users can return to editing without losing position or content.\n- [ ] AC-011.8: An explanatory label states that LinkedIn may render the pasted content differently.\n- [ ] AC-011.9: No LinkedIn content is downloaded or scraped to construct the preview.\n\n**Design Requirement**\n\nThe preview should reproduce the essential visual structure of a LinkedIn post without copying LinkedIn branding or claiming pixel-perfect compatibility.\n\nAn estimated “see more” boundary may be added only if a testable approximation is available.\n\n\n## Dependencies\n\nUS-006, US-010 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-006",
+        "US-010"
+      ]
+    },
+    {
+      "key": "US-012",
+      "title": "[US-012] Select Application Theme",
+      "kind": "story",
+      "parent": "E07",
+      "sprint": 3,
+      "points": 2,
+      "body": "<!-- postnook:US-012 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **2** (from PRD).\n\nPriority: P0\nStory points: 2\n\n**User Story**\n\nAs a user, I want PostNook to match my preferred appearance.\n\n**Acceptance Criteria**\n\n- [ ] AC-012.1: Light theme is supported.\n- [ ] AC-012.2: Dark theme is supported.\n- [ ] AC-012.3: System preference is the default.\n- [ ] AC-012.4: Theme selection persists between sessions.\n- [ ] AC-012.5: Theme changes do not interrupt editing.\n- [ ] AC-012.6: Core controls meet WCAG 2.2 AA contrast and keyboard interaction requirements.\n\n\n## Dependencies\n\nUX-001 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "UX-001"
+      ]
+    },
+    {
+      "key": "US-013",
+      "title": "[US-013] Configure Output Behavior",
+      "kind": "story",
+      "parent": "E07",
+      "sprint": 3,
+      "points": 3,
+      "body": "<!-- postnook:US-013 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **3** (from PRD).\n\nPriority: P0\nStory points: 3\n\n**User Story**\n\nAs a writer, I want control over the text copied from PostNook.\n\n**Acceptance Criteria**\n\n- [ ] AC-013.1: Default output is plain text.\n- [ ] AC-013.2: Unicode styling is opt-in.\n- [ ] AC-013.3: The active output mode is visible.\n- [ ] AC-013.4: Unicode mode displays an accessibility warning before first use.\n- [ ] AC-013.5: Preferences persist locally.\n- [ ] AC-013.6: Changing output mode immediately updates the counter and preview.\n- [ ] AC-013.7: Switching output modes does not alter the original document.\n\n\n## Dependencies\n\nUS-006, US-007, US-011, UX-001 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-006",
+        "US-007",
+        "US-011",
+        "UX-001"
+      ]
+    },
+    {
+      "key": "TF-001",
+      "title": "[TF-001] Initialize the React, TypeScript, and Vite project",
+      "kind": "task",
+      "parent": "E00",
+      "sprint": 0,
+      "points": null,
+      "body": "<!-- postnook:TF-001 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **0**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 8, 13, 16. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Create the suggested source and test structure with React, TypeScript strict mode, Vite, Tailwind CSS, Tiptap, Dexie, Vitest, React Testing Library, and Playwright.\n- [ ] Pin production dependency versions and commit a lockfile; define build, typecheck, lint, format-check, and test commands.\n- [ ] Define the service and repository boundaries in sections 8 and 10; keep domain code independent of React and browser APIs.\n- [ ] Document local development and loading an unpacked extension; a clean checkout can install and build.\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": []
+    },
+    {
+      "key": "TF-002",
+      "title": "[TF-002] Prototype Manifest V3 and native side-panel opening",
+      "kind": "task",
+      "parent": "E00",
+      "sprint": 0,
+      "points": null,
+      "body": "<!-- postnook:TF-002 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **0**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 11, 16. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Prototype the packaged service worker and side-panel entry with action-click opening on Chrome and Edge.\n- [ ] Use sidePanel and storage permissions, packaged icons, Chrome minimum version 116, and no action default_popup.\n- [ ] Confirm no host permissions, content scripts, forbidden permissions, or remotely hosted executable code.\n- [ ] Record tested browser versions and initialization failure behavior; hand the findings to US-001.\n\n## Dependencies\n\nTF-001 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-001"
+      ]
+    },
+    {
+      "key": "TF-003",
+      "title": "[TF-003] Validate clipboard writing in Chrome and Edge",
+      "kind": "task",
+      "parent": "E00",
+      "sprint": 0,
+      "points": null,
+      "body": "<!-- postnook:TF-003 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **0**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 6 (US-008), 11, 16. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Test navigator.clipboard.writeText from a direct side-panel user action in Chrome and Edge.\n- [ ] Record permission behavior, success, rejection, and unavailable-API cases.\n- [ ] Prototype a manual select-and-copy fallback and add no clipboard permission without demonstrated necessity.\n\n## Dependencies\n\nTF-002 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-002"
+      ]
+    },
+    {
+      "key": "TF-004",
+      "title": "[TF-004] Prototype revision-aware IndexedDB persistence",
+      "kind": "task",
+      "parent": "E00",
+      "sprint": 0,
+      "points": null,
+      "body": "<!-- postnook:TF-004 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **0**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 9, 10, 16. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Prototype the postnook database using Dexie, schema version 1, and drafts indexed by id, updatedAt, and createdAt.\n- [ ] Validate the Draft entity, UUID v4, UTC timestamps, title limit, supported document schema, and initial revision.\n- [ ] Demonstrate transactional save/reopen, conflict rejection, failed-write preservation, and a migration preserving existing records.\n- [ ] Document the boundary between IndexedDB documents and chrome.storage.local preferences.\n\n## Dependencies\n\nTF-001 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-001"
+      ]
+    },
+    {
+      "key": "TF-005",
+      "title": "[TF-005] Validate the minimal Tiptap editor schema",
+      "kind": "task",
+      "parent": "E00",
+      "sprint": 0,
+      "points": null,
+      "body": "<!-- postnook:TF-005 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **0**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 6 (US-002), 8, 16. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Prototype paragraphs, hard breaks, text, bold, italic, and ordered and unordered lists only.\n- [ ] Verify JSON round-trip, selection stability, keyboard editing, undo/redo, and safe unsupported-content handling.\n- [ ] Disable unnecessary StarterKit features and record the selected extension configuration.\n\n## Dependencies\n\nTF-001 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-001"
+      ]
+    },
+    {
+      "key": "TF-006",
+      "title": "[TF-006] Evaluate Markdown conversion and output serialization",
+      "kind": "task",
+      "parent": "E00",
+      "sprint": 0,
+      "points": null,
+      "body": "<!-- postnook:TF-006 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **0**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 6 (US-004, US-006), 10, 16. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Evaluate a Markdown implementation behind the replaceable MarkdownAdapter interface; record the beta-library tradeoff described in the PRD.\n- [ ] Prototype deterministic plain output for paragraphs, hard breaks, lists, emoji, and non-Latin text.\n- [ ] Record unsupported syntax, safe embedded-HTML behavior, and Unicode-mode limitations.\n- [ ] Demonstrate the Sprint 0 exit workflow: a text-only side panel saves, reopens, and copies content in Chrome and Edge.\n\n## Dependencies\n\nTF-003, TF-004, TF-005 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-003",
+        "TF-004",
+        "TF-005"
+      ]
+    },
+    {
+      "key": "UX-001",
+      "title": "[UX-001] Build the narrow side-panel shell and recoverable states",
+      "kind": "task",
+      "parent": "E07",
+      "sprint": 1,
+      "points": null,
+      "body": "<!-- postnook:UX-001 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **1**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 7, 9.2. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Implement the specified header, editor toolbar, main content, and footer from approximately 320 CSS pixels without application-wide horizontal scrolling.\n- [ ] Provide first-post, empty-draft, and no-content-to-copy states with the PRD copy.\n- [ ] Provide labeled controls, visible focus, keyboard navigation, status announcements, non-color-only warnings, and reduced-motion support.\n- [ ] Define recoverable initialization, storage, load/save, quota, clipboard, parsing, and stale-revision error presentations; never replace failed loads with a blank draft.\n- [ ] Initialize, validate, and persist versioned settings through SettingsRepository and chrome.storage.local; retain unsaved editor content on errors.\n\n## Dependencies\n\nTF-001 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-001"
+      ]
+    },
+    {
+      "key": "QA-001",
+      "title": "[QA-001] Complete serializer, import, counter, and storage test matrices",
+      "kind": "task",
+      "parent": "E08",
+      "sprint": 3,
+      "points": null,
+      "body": "<!-- postnook:QA-001 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 14.1, 17. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Cover every serializer, Markdown adapter, character counter, and draft repository case listed in section 14.1.\n- [ ] Include malformed nodes, executable pasted content, emoji and combining sequences, unsupported structures, rollback, migrations, quota failures, and revision conflicts.\n- [ ] Keep test expectations independent of the implementation and record any uncovered requirement as an open defect.\n\n## Dependencies\n\nUS-004, US-005, US-006, US-007, US-009 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-004",
+        "US-005",
+        "US-006",
+        "US-007",
+        "US-009"
+      ]
+    },
+    {
+      "key": "QA-002",
+      "title": "[QA-002] Verify recovery, integration, and browser compatibility",
+      "kind": "task",
+      "parent": "E08",
+      "sprint": 3,
+      "points": null,
+      "body": "<!-- postnook:QA-002 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 14.2, 14.3. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Run and document all 15 integration scenarios in section 14.2, including restart recovery, save failure, clipboard rejection, and stale revisions.\n- [ ] Test Chrome Stable on Windows 11 and macOS and Edge Stable on Windows 11; attempt the recommended Edge/macOS configuration.\n- [ ] Run previous-major Chrome and Edge regression checks on Windows where required APIs exist; record versions, OS, and outcomes.\n- [ ] Verify all successfully committed content survives reopening; distinguish pending uncommitted edits and block release on critical data-loss defects.\n\n## Dependencies\n\nUS-001, US-008, US-009, US-010, US-011, US-012, US-013 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-001",
+        "US-008",
+        "US-009",
+        "US-010",
+        "US-011",
+        "US-012",
+        "US-013"
+      ]
+    },
+    {
+      "key": "QA-003",
+      "title": "[QA-003] Audit privacy, permissions, CSP, and paste security",
+      "kind": "task",
+      "parent": "E08",
+      "sprint": 3,
+      "points": null,
+      "body": "<!-- postnook:QA-003 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 3.3, 11, 12. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Inspect production bundles and manifests for forbidden permissions, content scripts, remote code, eval, inline executable scripts, and page inspection.\n- [ ] Verify no backend, credentials, telemetry SDK, draft transmission, automatic clipboard reading, or LinkedIn automation.\n- [ ] Test sanitization against scripts, event attributes, and unsafe HTML without executing user content.\n- [ ] Confirm storage validation, quota errors, migration safety, and documentation of uninstall/storage-removal loss without encryption claims.\n\n## Dependencies\n\nUS-004, US-005, US-009 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-004",
+        "US-005",
+        "US-009"
+      ]
+    },
+    {
+      "key": "QA-004",
+      "title": "[QA-004] Validate accessibility and performance targets",
+      "kind": "task",
+      "parent": "E08",
+      "sprint": 3,
+      "points": null,
+      "body": "<!-- postnook:QA-004 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 7.5, 13. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Run keyboard-only and screen-reader workflows across editing, drafts, settings, preview, errors, and copy.\n- [ ] Check WCAG 2.2 AA contrast, names, focus, semantics, announcements, reduced motion, and the 320 CSS pixel layout.\n- [ ] Measure on documented reference hardware: interactive state within 2 seconds, formatting under 100 ms, 3,000-character serialization under 50 ms, saves under 500 ms after start, and preview under 200 ms.\n- [ ] Record typing responsiveness and navigation persistence; fix release-blocking regressions.\n\n## Dependencies\n\nUX-001, US-012, US-013 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "UX-001",
+        "US-012",
+        "US-013"
+      ]
+    },
+    {
+      "key": "QA-005",
+      "title": "[QA-005] Run manual LinkedIn paste compatibility tests",
+      "kind": "task",
+      "parent": "E08",
+      "sprint": 3,
+      "points": null,
+      "body": "<!-- postnook:QA-005 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 14.4, 6 (US-007). Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Have a human tester manually paste all 12 cases in section 14.4; do not scrape, automate LinkedIn, or access account credentials.\n- [ ] Record browser, OS, source, output mode, observed spacing and character behavior, and differences from preview.\n- [ ] Check the PRD assumption of a 3,000-character limit against current official documentation and observed behavior; label the UTF-16 counter as an estimate.\n- [ ] Document unreliable conversions and Unicode limitations instead of claiming exact compatibility.\n\n## Dependencies\n\nUS-005, US-006, US-007, US-008, US-011 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-005",
+        "US-006",
+        "US-007",
+        "US-008",
+        "US-011"
+      ]
+    },
+    {
+      "key": "REL-001",
+      "title": "[REL-001] Implement validation and release packaging workflows",
+      "kind": "task",
+      "parent": "E09",
+      "sprint": 0,
+      "points": null,
+      "body": "<!-- postnook:REL-001 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **0**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 15. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Configure PR checks for installation, TypeScript, ESLint, formatting, unit and integration tests, production build, manifest validation, and artifacts.\n- [ ] Configure main to run all validation and publish extension build artifacts.\n- [ ] On version tags, validate version consistency, test, package Chrome and Edge, create checksums, and attach artifacts to the GitHub release.\n- [ ] Ensure failed required checks fail the pipeline and configure required merge checks when available; document any repository-setting limitation.\n- [ ] Keep marketplace submission manual for v0.1 unless separately authorized.\n\n## Dependencies\n\nTF-001 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "TF-001"
+      ]
+    },
+    {
+      "key": "REL-002",
+      "title": "[REL-002] Write engineering, privacy, and user documentation",
+      "kind": "task",
+      "parent": "E09",
+      "sprint": 3,
+      "points": null,
+      "body": "<!-- postnook:REL-002 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 8-12, 17, 22. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Document setup, architecture, service contracts, storage schema/migrations, browser tests, and support/error recovery.\n- [ ] Write the privacy policy reflecting the implemented local-only behavior and manual publishing.\n- [ ] Explain Unicode accessibility limitations, estimated counts, preview differences, and the lack of a platform rendering guarantee.\n- [ ] Explain uninstall/storage deletion risks and manual copies until backup/export planned for v0.2.\n\n## Dependencies\n\nUS-009, US-013, QA-003 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "US-009",
+        "US-013",
+        "QA-003"
+      ]
+    },
+    {
+      "key": "REL-003",
+      "title": "[REL-003] Prepare extension icons and marketplace submissions",
+      "kind": "task",
+      "parent": "E09",
+      "sprint": 3,
+      "points": null,
+      "body": "<!-- postnook:REL-003 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 11, 18, 22. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Package actual extension icons and verify manifest asset paths in both browser builds.\n- [ ] Prepare Chrome Web Store and Edge Add-ons descriptions, screenshots, privacy disclosures, and submission instructions.\n- [ ] Use PostNook identity and accurate feature limitations without LinkedIn branding or unsupported compatibility claims.\n- [ ] Verify production packages and document manual submission status; marketplace publication is a separate execution step.\n\n## Dependencies\n\nREL-001, REL-002, QA-005 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "REL-001",
+        "REL-002",
+        "QA-005"
+      ]
+    },
+    {
+      "key": "REL-004",
+      "title": "[REL-004] Complete v0.1.0 release gates and consent-based pilot plan",
+      "kind": "task",
+      "parent": "E09",
+      "sprint": 3,
+      "points": null,
+      "body": "<!-- postnook:REL-004 -->\n\nSource: [PostNook PRD v1.0](https://github.com/kasuken/PostNook/blob/main/docs/PRD.md). Target: **v0.1.0**.\n\nPriority: **P0**. Sprint: **3**. Story points: **TBC** (derived task).\n\nDerived engineering task from PRD sections 2, 16-18, 22. Scope and acceptance criteria below decompose the supplied requirements; estimates are not assigned.\n\n## Acceptance criteria\n\n- [ ] Track and attach evidence for every release gate in section 18 and all 20 engineering deliverables in section 22.\n- [ ] Confirm story Definition of Done, supported-browser results, code review, documentation, and zero unresolved critical defects.\n- [ ] Prepare a consent-based pilot measurement plan for activation, copy/paste, recovery, second-post creation, Week-4 retention, and satisfaction using section 2 targets.\n- [ ] Keep targets distinct from actual results; add no analytics SDK or draft transmission.\n- [ ] Do not mark release complete until all blocking requirements pass; defer post-MVP features until recurring usage is demonstrated.\n\n## Dependencies\n\nQA-001, QA-002, QA-003, QA-004, QA-005, REL-001, REL-002, REL-003 (see the linked backlog index).\n\n## Shared Definition of Done\n\nEvery user story must meet the following conditions:\n\n* Functional acceptance criteria pass.\n* Code passes TypeScript strict checks.\n* Relevant unit tests exist.\n* Required integration tests pass.\n* No critical accessibility regressions.\n* No unnecessary browser permissions are introduced.\n* No LinkedIn scraping or automation is introduced.\n* Error states are handled.\n* Code is reviewed.\n* Documentation is updated.\n* The feature works in supported browsers.\n\n[Backlog index](https://github.com/kasuken/PostNook/blob/main/docs/backlog-index.md)\n",
+      "dependencies": [
+        "QA-001",
+        "QA-002",
+        "QA-003",
+        "QA-004",
+        "QA-005",
+        "REL-001",
+        "REL-002",
+        "REL-003"
+      ]
+    }
+  ]
+}
