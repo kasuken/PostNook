@@ -19,3 +19,14 @@ Implementation date: 2026-10-27. Target: E00, Sprint 0. This records engineering
 See [browser evidence](testing/browser-testing.md), [design walkthrough](design/prototype/README.md), and [UI review](design/ui-review.md). Existing PRD and published backlog files retain their original content; the original publication-verification report describes the earlier bootstrap, not this implementation.
 
 Release CI, marketplace distribution, full compatibility/accessibility testing, manual LinkedIn paste validation, and performance targets remain in downstream tasks. The production build currently has a bundle-size advisory. No store release or automatic publishing was performed.
+
+## E01 Browser Extension Foundation
+
+| Story                         | Issue                                                | Status      | Evidence                                                                                                                   |
+| ----------------------------- | ---------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| US-001 open from the browser  | [#11](https://github.com/kasuken/PostNook/issues/11) | Implemented | Native action probe on Chrome and Edge 156, manifest allowlist, worker retry test, first-run and error-state startup tests |
+| E01 Extension Foundation epic | [#2](https://github.com/kasuken/PostNook/issues/2)   | Implemented | Single child US-001 closed                                                                                                 |
+
+US-001 acceptance mapping: AC-001.1 to .3 and .6 are covered by the native probe (`docs/testing/chrome-native.json`, `msedge-native.json`) against an ordinary tab with only `sidePanel` and `storage` permissions and no host access, so the panel is independent of the active site, including LinkedIn. AC-001.4 and .5 are covered by the probe's reload and browser-restart restore. AC-001.7 and .8 are covered by `tests/integration/panel-startup.test.tsx` and `tests/unit/background.test.ts`.
+
+Not verified: Chrome 116 (the declared minimum) and previous-major releases; only the installed Chrome/Edge 156 builds were exercised. No LinkedIn page was driven.
