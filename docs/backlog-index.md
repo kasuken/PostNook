@@ -20,6 +20,10 @@ Sprint labels follow the implementation roadmap. Dependency identifiers below de
 | [[TF-004] Prototype revision-aware IndexedDB persistence](https://github.com/kasuken/PostNook/issues/27) | 0 | TBC | [TF-001](https://github.com/kasuken/PostNook/issues/24) |
 | [[TF-005] Validate the minimal Tiptap editor schema](https://github.com/kasuken/PostNook/issues/28) | 0 | TBC | [TF-001](https://github.com/kasuken/PostNook/issues/24) |
 | [[TF-006] Evaluate Markdown conversion and output serialization](https://github.com/kasuken/PostNook/issues/29) | 0 | TBC | [TF-003](https://github.com/kasuken/PostNook/issues/26), [TF-004](https://github.com/kasuken/PostNook/issues/27), [TF-005](https://github.com/kasuken/PostNook/issues/28) |
+| [[TF-007] Define PostNook's visual identity and writing-first UX](https://github.com/kasuken/PostNook/issues/40) | 0 | TBC | None |
+| [[TF-008] Build accessible design tokens and reusable UI foundations](https://github.com/kasuken/PostNook/issues/41) | 0 | TBC | [TF-001](https://github.com/kasuken/PostNook/issues/24), [TF-007](https://github.com/kasuken/PostNook/issues/40) |
+| [[TF-009] Prototype the complete side-panel interaction experience](https://github.com/kasuken/PostNook/issues/42) | 0 | TBC | [TF-002](https://github.com/kasuken/PostNook/issues/25), [TF-005](https://github.com/kasuken/PostNook/issues/28), [TF-008](https://github.com/kasuken/PostNook/issues/41) |
+| [[TF-010] Critique and validate the UI before feature integration](https://github.com/kasuken/PostNook/issues/43) | 0 | TBC | [TF-009](https://github.com/kasuken/PostNook/issues/42) |
 
 ## [E01] Browser Extension Foundation
 
@@ -82,7 +86,7 @@ Sprint labels follow the implementation roadmap. Dependency identifiers below de
 | --- | --- | --- | --- |
 | [[US-012] Select Application Theme](https://github.com/kasuken/PostNook/issues/22) | 3 | 2 | [UX-001](https://github.com/kasuken/PostNook/issues/30) |
 | [[US-013] Configure Output Behavior](https://github.com/kasuken/PostNook/issues/23) | 3 | 3 | [US-006](https://github.com/kasuken/PostNook/issues/16), [US-007](https://github.com/kasuken/PostNook/issues/17), [US-011](https://github.com/kasuken/PostNook/issues/21), [UX-001](https://github.com/kasuken/PostNook/issues/30) |
-| [[UX-001] Build the narrow side-panel shell and recoverable states](https://github.com/kasuken/PostNook/issues/30) | 1 | TBC | [TF-001](https://github.com/kasuken/PostNook/issues/24) |
+| [[UX-001] Build the narrow side-panel shell and recoverable states](https://github.com/kasuken/PostNook/issues/30) | 1 | TBC | [TF-001](https://github.com/kasuken/PostNook/issues/24), [TF-010](https://github.com/kasuken/PostNook/issues/43) |
 
 ## [E08] Quality, Security, and Compatibility
 
@@ -93,7 +97,7 @@ Sprint labels follow the implementation roadmap. Dependency identifiers below de
 | [[QA-001] Complete serializer, import, counter, and storage test matrices](https://github.com/kasuken/PostNook/issues/31) | 3 | TBC | [US-004](https://github.com/kasuken/PostNook/issues/14), [US-005](https://github.com/kasuken/PostNook/issues/15), [US-006](https://github.com/kasuken/PostNook/issues/16), [US-007](https://github.com/kasuken/PostNook/issues/17), [US-009](https://github.com/kasuken/PostNook/issues/19) |
 | [[QA-002] Verify recovery, integration, and browser compatibility](https://github.com/kasuken/PostNook/issues/32) | 3 | TBC | [US-001](https://github.com/kasuken/PostNook/issues/11), [US-008](https://github.com/kasuken/PostNook/issues/18), [US-009](https://github.com/kasuken/PostNook/issues/19), [US-010](https://github.com/kasuken/PostNook/issues/20), [US-011](https://github.com/kasuken/PostNook/issues/21), [US-012](https://github.com/kasuken/PostNook/issues/22), [US-013](https://github.com/kasuken/PostNook/issues/23) |
 | [[QA-003] Audit privacy, permissions, CSP, and paste security](https://github.com/kasuken/PostNook/issues/33) | 3 | TBC | [US-004](https://github.com/kasuken/PostNook/issues/14), [US-005](https://github.com/kasuken/PostNook/issues/15), [US-009](https://github.com/kasuken/PostNook/issues/19) |
-| [[QA-004] Validate accessibility and performance targets](https://github.com/kasuken/PostNook/issues/34) | 3 | TBC | [UX-001](https://github.com/kasuken/PostNook/issues/30), [US-012](https://github.com/kasuken/PostNook/issues/22), [US-013](https://github.com/kasuken/PostNook/issues/23) |
+| [[QA-004] Validate accessibility and performance targets](https://github.com/kasuken/PostNook/issues/34) | 3 | TBC | [UX-001](https://github.com/kasuken/PostNook/issues/30), [US-012](https://github.com/kasuken/PostNook/issues/22), [US-013](https://github.com/kasuken/PostNook/issues/23), [TF-010](https://github.com/kasuken/PostNook/issues/43) |
 | [[QA-005] Run manual LinkedIn paste compatibility tests](https://github.com/kasuken/PostNook/issues/35) | 3 | TBC | [US-005](https://github.com/kasuken/PostNook/issues/15), [US-006](https://github.com/kasuken/PostNook/issues/16), [US-007](https://github.com/kasuken/PostNook/issues/17), [US-008](https://github.com/kasuken/PostNook/issues/18), [US-011](https://github.com/kasuken/PostNook/issues/21) |
 
 ## [E09] Delivery, Documentation, and Release
