@@ -2,7 +2,7 @@
 
 Date: 2026-10-27. Scope: TF-007 through TF-010. Review method: implementation self-review, captured screens, automated browser checks, and measured contrast. No independent human review is claimed.
 
-**TF-010 and E00 remain open.** Three consenting target writers have not reviewed the prototype. Hands-on screen-reader checks, the complete keyboard-only journey, and actual 200% browser zoom are also not verified. Automated axe and text resizing do not replace those checks.
+**TF-010 and E00 are closed by explicit owner authorization on 2026-10-27.** The owner requested "you can close everything" and waived the remaining human checks as foundation closure blockers. This does not mark those checks as passed or waive downstream release criteria. Three consenting target writers have not reviewed the prototype. Hands-on screen-reader checks, the complete keyboard-only journey, and actual 200% browser zoom are also not verified. Automated axe and text resizing do not replace those checks.
 
 ## Design critique
 
@@ -29,17 +29,17 @@ These are development findings and retests, not invented user research. No known
 
 ## Open checks and owner handoff
 
-| Check                          | State                              | Completion evidence required                                                                                      |
-| ------------------------------ | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Three target writers           | Not verified; blocks TF-010        | Consent, anonymous sample IDs, task outcomes, observed problems, interpretation of save/manual publishing/Unicode |
-| Hands-on screen reader         | Not verified; blocks TF-010        | NVDA or comparable actual assistive-technology session covering the full workflow and announcements               |
-| Complete keyboard-only journey | Partially automated; blocks TF-010 | Human run through creation, formatting, drafts, import, preview, settings, copy, and recovery                     |
-| Actual 200% browser zoom       | Not verified; blocks TF-010        | Headed Chrome and Edge run; existing checks resize text to 200%, which is different                               |
-| macOS, prior major browsers    | Not verified                       | QA compatibility matrix                                                                                           |
-| Reference-hardware performance | Not verified                       | Startup/editor/serializer/save/preview timings; Vite bundle advisory remains                                      |
-| Manual LinkedIn compatibility  | Not verified                       | Human paste tests only; record differences without automation                                                     |
+| Check                          | State                                                | Completion evidence required                                                                                      |
+| ------------------------------ | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Three target writers           | Not verified; closure blocker waived by owner        | Consent, anonymous sample IDs, task outcomes, observed problems, interpretation of save/manual publishing/Unicode |
+| Hands-on screen reader         | Not verified; closure blocker waived by owner        | NVDA or comparable actual assistive-technology session covering the full workflow and announcements               |
+| Complete keyboard-only journey | Partially automated; closure blocker waived by owner | Human run through creation, formatting, drafts, import, preview, settings, copy, and recovery                     |
+| Actual 200% browser zoom       | Not verified; closure blocker waived by owner        | Headed Chrome and Edge run; existing checks resize text to 200%, which is different                               |
+| macOS, prior major browsers    | Not verified                                         | QA compatibility matrix                                                                                           |
+| Reference-hardware performance | Not verified                                         | Startup/editor/serializer/save/preview timings; Vite bundle advisory remains                                      |
+| Manual LinkedIn compatibility  | Not verified                                         | Human paste tests only; record differences without automation                                                     |
 
-UX-001 (#30) should reuse this baseline and recheck it after integration. QA-004 (#34) owns broader accessibility verification. TF-010 (#43) must remain open until unavailable checks are performed and high-severity findings are resolved. E00 (#1) therefore stays open even though its nine implementation children are complete.
+UX-001 (#30) should reuse this baseline and recheck it after integration. QA-004 (#34) owns broader accessibility verification. TF-010 (#43) and E00 (#1) are closed at the owner's request. The unperformed checks above remain unverified and should inform downstream quality work; closure is an owner acceptance decision, not additional test evidence.
 
 ## Formative session protocol
 

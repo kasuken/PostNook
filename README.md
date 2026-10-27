@@ -10,7 +10,7 @@ PostNook is a free, local-first Chrome and Edge extension for writing LinkedIn p
 
 ## Project status
 
-The technical foundation and working UI are implemented. This is an unpacked development build, not a marketplace release. The [foundation review](docs/design/ui-review.md) remains open for human accessibility and three-writer usability checks. Later feature and release epics retain their own acceptance gates.
+The technical foundation and working UI are implemented. This is an unpacked development build, not a marketplace release. The owner has accepted foundation closure with the unperformed human checks waived as blockers; the [review record](docs/design/ui-review.md) preserves their unverified status. Later feature and release epics retain their own acceptance gates.
 
 - [Product requirements, version 1.0](docs/PRD.md)
 - [Original supplied PRD](docs/PRD.source.txt)
@@ -69,7 +69,7 @@ Plain text is the default output. Optional Unicode emphasis requires an accessib
 
 ## Implementation sequence
 
-Sprint 0 now supplies the React/TypeScript/Vite project, native panel, clipboard, transactional storage, Tiptap, Markdown adapter, serializer, and UI baseline. Complete the remaining human design review, then continue with the PRD's writing, persistence, and release sprints.
+Sprint 0 now supplies the React/TypeScript/Vite project, native panel, clipboard, transactional storage, Tiptap, Markdown adapter, serializer, and UI baseline. The owner has accepted Sprint 0 closure. Continue with the PRD's writing, persistence, and release sprints; the human review checks remain unverified.
 
 The backlog retains E01-E07 and US-001-US-013 from the PRD. E00, E08, E09, and prefixed engineering tasks decompose its foundation, quality, and release requirements. Derived tasks are not given invented story-point estimates. Future v0.2, v0.3, and v1.0 ideas remain in the PRD outside the MVP backlog.
 
