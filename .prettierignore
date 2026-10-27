@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+playwright-report
+test-results
+.browser-profiles
+artifacts
+package-lock.json
+docs/PRD.source.txt
+docs/PRD.md
+docs/backlog.json
+docs/backlog-index.md
+docs/backlog-verification.md
