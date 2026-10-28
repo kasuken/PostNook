@@ -315,3 +315,17 @@ Details, measurements and the scenario mapping are in [QA evidence](testing/qa-m
 Validation (2026-10-28): typecheck, lint, format, 111 unit and integration tests, production build with the manifest check and security audit, Playwright 62 tests on Chrome and Edge, and the native probe on both browsers.
 
 Also fixed: the E07 startup test for unreadable preferences queried the Create first post button before loading finished and could fail; it now waits for it.
+
+## E09 Delivery, Documentation, and Release
+
+| Task                                 | Issue                                                | Status      | Evidence                                                                                                 |
+| ------------------------------------ | ---------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------- |
+| REL-001 validation and release CI    | [#36](https://github.com/kasuken/PostNook/issues/36) | Written     | `ci.yml` (PRs and `main`) and `release.yml` (tags, draft release); not yet run on GitHub                 |
+| REL-002 documentation                | [#37](https://github.com/kasuken/PostNook/issues/37) | Implemented | [User guide](user-guide.md), [support](support.md), [privacy policy](privacy.md), architecture contracts |
+| REL-003 icons and store assets       | [#38](https://github.com/kasuken/PostNook/issues/38) | Implemented | [Store submission](release/store-submission.md), store images, verified packages; submission is manual   |
+| REL-004 release gates and pilot plan | [#39](https://github.com/kasuken/PostNook/issues/39) | Open        | [Release gates](release/v0.1.0-gates.md) tracked with pilot plan; five gates open                        |
+| E09 epic                             | [#10](https://github.com/kasuken/PostNook/issues/10) | Open        | Waiting on REL-001's first GitHub run and REL-004's gates                                                |
+
+REL-001: actions are pinned to commit SHAs, `GITHUB_TOKEN` is read-only except for the release job's `contents: write`, checkout does not persist credentials, and the tag is passed through an environment variable. The release is created as a draft, so publishing stays a manual decision, and store submission stays manual. Required merge checks are a repository setting that only the owner can enable after the first run. The CI browser project (`chromium`) passed 31/31 locally on Windows. The Linux runner has not been exercised.
+
+REL-003: both ZIPs contain `manifest.json` at the root (0.1.0, `sidePanel` and `storage` only), the four icons and the built assets. They are identical, as intended.

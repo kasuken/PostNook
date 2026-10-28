@@ -1,4 +1,4 @@
-# Technical foundation
+# Architecture
 
 The side-panel React application owns the active editor and unsaved work. The service worker only enables action-click opening and records initialization errors. It does not store editing state.
 
@@ -32,6 +32,21 @@ Autosave waits 300 ms after an edit and persists at least every 1,500 ms during 
 
 The migration spike tests `migrateDraftV1` inside a transaction with preserved content and unknown fields. Schema 0 is a synthetic fixture, not a previously released database. Initial production storage remains version 1. Future schema upgrades must register a Dexie `.version(n).upgrade(...)` transaction, validate records, preserve unknown fields, and test rollback. Unknown versions and corrupt records are never deleted automatically.
 
+## Service contracts
+
+The PRD section 10 contracts live in `src/domain/contracts.ts` and are implemented as follows. UI code depends on these contracts, not on Dexie, the clipboard API or `chrome.storage` directly.
+
+| Contract           | Implementation                                     | Operations                                                                                                                                                                                                                                            |
+| ------------------ | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DraftRepository    | `IndexedDraftRepository` (`src/storage/drafts.ts`) | `createDraft`, `getDraft`, `listDrafts` (readable drafts plus an unreadable count), `updateDraft(id, expectedRevision, content, title)` returning the new revision or a typed `DraftError`, `deleteDraft(id, expectedRevision)`, `updateLastCopiedAt` |
+| PostSerializer     | `serializePost`, `validateDocument`                | Pure and deterministic; throws on an unsupported document rather than copying it                                                                                                                                                                      |
+| MarkdownAdapter    | `MarkedAdapter` (`src/services/markdown.ts`)       | `parse` (200,000-character limit, inert HTML), `serialize` for tests and portability; clipboard output never uses Markdown                                                                                                                            |
+| PasteNormalizer    | `src/services/paste.ts`                            | `normalizePlainText`, `normalizeHtml` (DOMPurify, then inert parsing), `parseSupportedClipboardContent`                                                                                                                                               |
+| CharacterCounter   | `countCharacters`, `getLimitStatus`                | UTF-16 estimate of the serialized text; normal, approaching (from 2,900) and over (above 3,000)                                                                                                                                                       |
+| ClipboardService   | `BrowserClipboard` (`src/browser/clipboard.ts`)    | `copyText` resolves `{ ok: true }` only after `writeText` resolves, otherwise an actionable message                                                                                                                                                   |
+| SettingsRepository | `BrowserSettings` (`src/browser/settings.ts`)      | `load` validates and defaults each field and rejects newer schemas; `save`. An unreadable store opens the panel with session-only defaults                                                                                                            |
+| AutosaveService    | `src/services/autosave.ts`                         | Dirty generations, debounce and maximum wait, flush, explicit retry, conflict detection, observable status                                                                                                                                            |
+
 ## Output and errors
 
 `serializePost(document, outputMode)` is shared by preview, counter, and clipboard. Paragraphs use two newlines, hard breaks one, bullets `• `, and ordered items sequential numbering. Nested lists, extra item paragraphs and line breaks inside an item are indented under their marker. Empty list items are left out, and excess blank lines and trailing spaces are normalized. Plain mode ignores emphasis marks; Unicode mode transforms supported marked Latin letters and protects URL, hashtag, and mention spans across mark boundaries. Original JSON stays unchanged. Unsupported characters remain ordinary text. Unicode accessibility and external rendering limitations are explained before use.
@@ -40,6 +55,8 @@ The 3,000 limit and 2,900 warning use UTF-16 code units, not a verified LinkedIn
 
 Only `sidePanel` and `storage` permissions are packaged. No host permissions, content scripts, remote code, backend, telemetry, or LinkedIn interactions exist. CSP blocks network connections. Styles allow editor inline attributes; scripts are restricted to packaged code.
 
-## Remaining work
+## Validation and release
 
-This is a Sprint 0 proof of concept with real services, not a completed v0.1 release. Release CI, performance measurements on reference hardware, macOS/previous-major compatibility, manual LinkedIn paste checks, independent review, and marketplace assets remain in their existing epics. The editor bundle triggers Vite's size advisory; profile startup before choosing where to split it.
+CI (`.github/workflows/ci.yml`) runs on pull requests and `main`: install, type check, lint, formatting, unit and integration tests, production build with the manifest check and security audit, Playwright on Chromium, packaging, and artifact upload. The release workflow (`.github/workflows/release.yml`) runs on `v*.*.*` tags: it checks the tag against `package.json` and the manifest, validates, packages Chrome and Edge ZIPs with SHA-256 checksums and creates a draft GitHub release. Store submission is manual ([store submission](release/store-submission.md)).
+
+Browser evidence is in [browser testing](testing/browser-testing.md) and [QA evidence](testing/qa-matrix.md). The editor bundle triggers Vite's size advisory; startup is measured at about 0.5 s, so splitting it is not needed for v0.1.

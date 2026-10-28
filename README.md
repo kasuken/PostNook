@@ -10,13 +10,14 @@ PostNook is a free, local-first Chrome and Edge extension for writing LinkedIn p
 
 ## Project status
 
-The technical foundation and working UI are implemented. This is an unpacked development build, not a marketplace release. The owner has accepted foundation closure with the unperformed human checks waived as blockers; the [review record](docs/design/ui-review.md) preserves their unverified status. Later feature and release epics retain their own acceptance gates.
+All v0.1.0 features are implemented and tested on Chrome and Edge 156 on Windows. It is not released yet: macOS and previous-major browser runs, human keyboard and screen-reader checks, manual LinkedIn paste tests and store submission are still open ([release gates](docs/release/v0.1.0-gates.md)).
 
+- [User guide](docs/user-guide.md), [support and recovery](docs/support.md) and [privacy policy](docs/privacy.md)
 - [Product requirements, version 1.0](docs/PRD.md)
 - [Original supplied PRD](docs/PRD.source.txt)
 - [Epics and child issues](docs/backlog-index.md)
 - [Machine-readable backlog](docs/backlog.json)
-- [Foundation implementation status](docs/implementation-status.md)
+- [Implementation status](docs/implementation-status.md) and [QA evidence](docs/testing/qa-matrix.md)
 - [Architecture](docs/architecture.md) and [Markdown decision](docs/decisions/001-markdown-adapter.md)
 - [Design system](docs/design/design-system.md) and [prototype walkthrough](docs/design/prototype/README.md)
 
@@ -55,7 +56,11 @@ npm run test:e2e -- --project=chrome --project=edge
 npm run package
 ```
 
-`validate` runs strict TypeScript, ESLint, formatting, unit/integration tests, the production build, and manifest validation. `package` writes separate Chrome and Edge ZIPs plus SHA-256 checksums to `artifacts/`. No store submission or public release is performed.
+`validate` runs strict TypeScript, ESLint, formatting, unit/integration tests, the production build, manifest validation and the security audit. `package` writes separate Chrome and Edge ZIPs plus SHA-256 checksums to `artifacts/`.
+
+GitHub Actions runs the same checks, Playwright on Chromium and packaging on every pull request and on `main`, and uploads the packages as artifacts. Pushing a `v*.*.*` tag that matches the package version creates a draft GitHub release with both ZIPs and checksums. Store submission is manual ([store submission](docs/release/store-submission.md)).
+
+`node scripts/measure-performance.mjs` measures the PRD performance targets ([QA evidence](docs/testing/qa-matrix.md)).
 
 The [native-panel probe](docs/testing/browser-testing.md) separately tests packaged action-click opening, clipboard read-back, and restart persistence. Browser UI tests cover narrow layouts, Unicode warnings, sanitization, save failures, and concurrent edits.
 

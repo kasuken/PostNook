@@ -1,13 +1,34 @@
-# Privacy and local data
+# Privacy policy
 
-PostNook's foundation build stores drafts on your device in the extension's IndexedDB. Appearance, output mode, preview choice, and active draft selection use local extension storage.
+Effective for PostNook v0.1.0. Last updated 2026-10-28.
 
-The extension has no account, backend, analytics SDK, advertising trackers, cloud synchronization, or remote fonts. It does not read websites, LinkedIn credentials, cookies, or page content. It neither pastes into LinkedIn nor publishes for you.
+PostNook is a free browser extension for writing posts in the Chrome and Edge side panel. This policy describes what the extension does with your information. It reflects how this version is actually built and is checked by an automated audit of every build (`scripts/audit-security.mjs`).
 
-Copy Post writes generated text to the system clipboard when you choose the action. Paste reads only clipboard data supplied by your paste event. Imported HTML is sanitized before conversion. Other applications and the operating system may have their own clipboard behavior.
+## What PostNook stores
 
-Local storage is not a backup and PostNook does not claim to encrypt drafts. Uninstalling the extension, clearing browser storage, or losing the browser profile can remove your work. Keep an external copy of important posts. Full backup/import remains outside v0.1.
+- **Drafts**: titles, content and timestamps, stored in the extension's IndexedDB on your device.
+- **Preferences**: theme, output mode, preview choice, the active draft and whether you have seen the Unicode warning, stored in the extension's local storage on your device.
 
-Saved on this device means the latest storage transaction completed. If saving fails, keep the editor open, copy the text somewhere safe, and retry. Unsaved edits can be lost in a crash. If another window saved a newer version, keep a separate recovered copy or explicitly reload it.
+Nothing else is stored, and nothing is stored anywhere but your browser profile.
 
-This document describes this implementation. It does not claim marketplace approval or completion of the release privacy review.
+## What PostNook does not do
+
+- It has no account, server or backend, and sends no data anywhere. Its content security policy blocks network connections (`connect-src 'none'`).
+- It contains no analytics, telemetry, advertising or error-reporting code.
+- It does not read the websites you visit. It has no host permissions or content scripts and requests only `sidePanel` and `storage`.
+- It never accesses LinkedIn, your LinkedIn credentials or cookies, and never pastes or publishes for you. You copy the text and publish it yourself.
+- It never reads your clipboard on its own. **Copy Post** writes to the clipboard only when you choose it. Paste uses only the data from a paste you make; pasted HTML is sanitized and never run.
+
+## Your control and data loss
+
+Your drafts stay until you delete them. Deleting a draft removes it after you confirm.
+
+Local storage is not a backup, and PostNook does not encrypt drafts beyond whatever protection your browser and operating system provide. **Uninstalling PostNook, clearing browser or extension storage, or losing the browser profile permanently deletes your drafts.** Keep a separate copy of important posts. Backup and export are not available in v0.1.
+
+"Saved on this device" means the last storage transaction completed. Edits made in the last moments before a crash may not be saved.
+
+Other applications and the operating system may handle clipboard contents under their own policies.
+
+## Changes and contact
+
+Changes to this policy are published with the extension and in this repository. Questions: [GitHub issues](https://github.com/kasuken/PostNook/issues).

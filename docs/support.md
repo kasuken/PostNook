@@ -1,0 +1,21 @@
+# Support and recovery
+
+PostNook keeps your text in the editor whenever something fails. Each message says whether retrying is safe or whether you should keep a separate copy first. Report problems in [GitHub issues](https://github.com/kasuken/PostNook/issues); never include your drafts unless you choose to.
+
+| What you see                                                      | What happened                                                                     | What to do                                                                                                                            |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Save failed**                                                   | A save did not complete. Your text is still in the editor.                        | Choose **Retry save**. If it keeps failing, **Keep separate copy** or copy the text elsewhere before closing the panel.               |
+| **Storage unavailable**                                           | The browser refused access to PostNook's storage.                                 | Keep the panel open, copy your text somewhere safe, then retry. Check that site data is not blocked for extensions.                   |
+| **Device storage is full**                                        | The device ran out of space for browser data.                                     | Keep a copy, free disk space or delete old drafts, then retry.                                                                        |
+| **Newer version found**                                           | Another PostNook window saved this draft after you opened it.                     | **Keep separate copy** keeps both. **Reload saved** replaces your unsaved text with the stored version after you confirm.             |
+| A load error with **Retry loading** and **Open remaining drafts** | The last draft you had open is missing or unreadable, or storage failed to open.  | **Retry loading** first. **Open remaining drafts** opens the others. The unreadable record is left untouched.                         |
+| **N stored drafts could not be read**                             | Some records are damaged or from a newer PostNook version.                        | Nothing is deleted. Update PostNook; the others keep working.                                                                         |
+| A notice that **default preferences are used for now**            | Settings are unreadable or from a newer version.                                  | PostNook uses default settings for this session without overwriting yours. **Retry preferences** reloads them. Drafts are unaffected. |
+| **Copy your post manually**                                       | The clipboard refused the copy.                                                   | Select the text in the dialog and press Ctrl+C (Cmd+C on Mac).                                                                        |
+| Markdown import error                                             | The text was too long (over 200,000 characters) or could not be converted safely. | Your draft is unchanged. Import a smaller section.                                                                                    |
+| **Your nook needs a moment**                                      | The editor failed to start.                                                       | **Try opening again**. Stored drafts are not replaced; edits made in the last moments before the failure may not have saved.          |
+| **Retry panel setup**                                             | The toolbar icon could not be set to open the panel.                              | Retry. If the panel still does not open, reload PostNook from the browser's extensions page after copying any open text.              |
+
+## Before you uninstall or clear data
+
+Uninstalling PostNook or clearing extension storage permanently deletes your drafts; there is no backup in v0.1. Copy any post you want to keep first.

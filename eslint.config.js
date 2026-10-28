@@ -48,6 +48,10 @@ export default tseslint.config(
     languageOptions: { globals: { document: 'readonly', getComputedStyle: 'readonly' } },
   },
   {
+    files: ['scripts/store-assets.mjs'],
+    languageOptions: { globals: { document: 'readonly' } },
+  },
+  {
     files: ['scripts/measure-performance.mjs'],
     languageOptions: {
       globals: {
