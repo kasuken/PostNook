@@ -100,6 +100,19 @@ describe('publishing text', () => {
         }),
       ),
     ).toBe('1. x\n2. y');
+    // An empty item that only holds a nested list keeps the nested items, not a doubled marker.
+    expect(
+      serializePost(
+        doc({
+          type: 'orderedList',
+          content: [
+            li(p(t('a'))),
+            li(p(), { type: 'bulletList', content: [li(p(t('n')))] }),
+            li(p(t('b'))),
+          ],
+        }),
+      ),
+    ).toBe('1. a\n  • n\n2. b');
     expect(serializePost(doc(p(t('A')), p(t('   ')), p(), p(), p(t('B  '))))).toBe('A\n\nB');
     expect(
       serializePost(doc(p({ type: 'hardBreak' }, { type: 'hardBreak' }, t('B')), p(), p())),

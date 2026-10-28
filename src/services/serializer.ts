@@ -55,27 +55,26 @@ export function serializePost(document: PostDocument, mode: OutputMode = 'plain'
     if (n.type === 'paragraph') return inline(n.content ?? [], mode);
     if (n.type === 'bulletList' || n.type === 'orderedList') {
       const indent = '  '.repeat(depth + 1);
-      return (
-        (n.content ?? [])
-          .map((item) =>
-            (item.content ?? [])
-              .map((child) =>
+      let number = 0;
+      return (n.content ?? [])
+        .map((item) => {
+          const parts = (item.content ?? [])
+            .map((child) => ({
+              text:
                 child.type === 'paragraph'
                   ? indent + block(child).replace(/\n/g, '\n' + indent)
                   : block(child, depth + 1),
-              )
-              .filter((part) => part.trim())
-              .join('\n')
-              .slice(indent.length),
-          )
-          // An empty item would copy as a lone marker, so it is left out.
-          .filter((body) => body.trim())
-          .map(
-            (body, index) =>
-              '  '.repeat(depth) + (n.type === 'bulletList' ? '• ' : `${index + 1}. `) + body,
-          )
-          .join('\n')
-      );
+              paragraph: child.type === 'paragraph',
+            }))
+            .filter((part) => part.text.trim());
+          const body = parts.map((part) => part.text).join('\n');
+          // An empty item would copy as a lone marker, so only its nested lists are kept.
+          if (!parts[0]?.paragraph) return body;
+          const marker = n.type === 'bulletList' ? '• ' : `${++number}. `;
+          return '  '.repeat(depth) + marker + body.slice(indent.length);
+        })
+        .filter((body) => body)
+        .join('\n');
     }
     return '';
   }

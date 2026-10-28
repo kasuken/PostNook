@@ -130,7 +130,7 @@ US-006 acceptance mapping:
 - AC-006.1 deterministic: repeated runs give identical text (`tests/unit/serializer.test.ts`).
 - AC-006.2 empty output: an empty document, an empty list item and whitespace-only paragraphs all produce `''`. Before this epic, an empty list item copied as a lone `•` and enabled Copy Post.
 - AC-006.3 spacing: two newlines between paragraphs, one per hard break, one blank line between paragraphs and lists, excess blank lines collapsed, trailing spaces removed.
-- AC-006.4 lists: `• ` bullets and sequential `1.`, `2.` numbers. Nested lists, extra item paragraphs and line breaks inside an item are indented under their marker (unit, and e2e clipboard read-back).
+- AC-006.4 lists: `• ` bullets and sequential `1.`, `2.` numbers. Nested lists, extra item paragraphs and line breaks inside an item are indented under their marker. An empty item that only holds a nested list keeps the nested items without a doubled marker (unit, and e2e clipboard read-back).
 - AC-006.5 emoji and international text kept (unit, stress e2e).
 - AC-006.6 no markup: marks emit no `<`, `*` or `_`. Literal `**x**` and `<b>` typed by the writer stay as typed.
 - AC-006.7 one service: preview, counter and clipboard all use the same `text` value from `serializePost`.
@@ -162,6 +162,7 @@ Validation (2026-10-27):
 - 65 unit and integration tests passed.
 - Production build and manifest check passed (existing bundle-size advisory).
 - Playwright: 44 tests on installed Chrome and Edge. The three new output tests were repeated 5 times on each browser.
+- Known flake: the existing stress test sometimes appends instead of replacing on `editor.fill` (2 of 24 repeats, and 1 of 24 on the pre-E04 source). It passes on rerun and is not caused by this epic.
 
 Not verified:
 
