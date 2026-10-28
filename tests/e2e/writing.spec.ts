@@ -240,9 +240,11 @@ test('draft switching saves edits and deletion requires an explicit confirmation
   await page.getByRole('button', { name: 'Create first post' }).click();
   const title = page.getByRole('textbox', { name: 'Draft title' });
   const editor = page.getByRole('textbox', { name: 'Post content' });
+  await expect(editor).toBeFocused();
   await title.fill('First draft');
   await editor.fill('Keep the first post');
   await page.getByRole('button', { name: 'New draft', exact: true }).click();
+  await expect(editor).toBeFocused();
   await title.fill('Second draft');
   await editor.fill('Keep the second post');
   await page.getByRole('button', { name: 'Open drafts', exact: true }).click();

@@ -208,8 +208,8 @@ Validation (2026-10-27):
 - Typecheck, lint and format checks passed.
 - 68 unit and integration tests passed.
 - Production build and manifest check passed (existing bundle-size advisory).
-- Playwright: 52 tests on installed Chrome and Edge, two clean full runs. The new and changed draft tests and the stress test were repeated 8 times on each browser.
-- The E04 stress-test flake is explained and fixed. The app focuses the editor late (once a new draft becomes editable, and one frame after Write), and a `fill` that lands before that focus loses its selection and appends. The stress test and the new tests now wait for the focus first. A few older tests type right after creating a draft and could still hit this; a person cannot type in that window.
+- Playwright: 52 tests on installed Chrome and Edge; the final full run passed, and an earlier full run hit the stress-test flake described below before it was fixed. The new and changed draft tests and the stress test were repeated 8 times on each browser.
+- The E04 stress-test flake is explained and fixed. The app focuses the editor late (once a new draft becomes editable, and one frame after Write), and a `fill` that lands before that focus loses its selection and appends. The stress test, the draft-switching test and the new tests now wait for the focus first. A few older tests type right after creating a draft and could still hit this; a person cannot type in that window.
 
 Not verified:
 
