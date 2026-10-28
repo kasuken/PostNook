@@ -227,11 +227,13 @@ describe('writing editor', () => {
     expect(get().getJSON()).toEqual(before);
   });
 
-  it('undoes a paste in one step, including a paste right after typing', async () => {
-    const user = userEvent.setup();
+  it('undoes a paste in one step, including a paste right after typing', () => {
     const { get } = setup();
-    get().commands.focus();
-    await user.keyboard('Typed');
+    // jsdom drops keystrokes into contenteditable; an inserted text step is recorded alike.
+    act(() => {
+      get().commands.insertContent('Typed');
+    });
+    expect(get().getText()).toBe('Typed');
     const typed = get().getJSON();
     act(() => {
       get().view.dom.dispatchEvent(
