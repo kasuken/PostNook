@@ -2,6 +2,13 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import type { Editor } from '@tiptap/react';
 import AxeBuilder from '@axe-core/playwright';
 
+// A new draft focuses the editor once it is editable. Typing before that can be lost or appended,
+// which a person cannot do, so every test starts writing only after the focus lands.
+async function createFirstPost(page: Page) {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  await expect(page.getByRole('textbox', { name: 'Post content' })).toBeFocused();
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto('/sidepanel.html');
 });
@@ -11,7 +18,7 @@ test('create, format, autosave, preview, copy, and restore the original draft', 
   context,
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   await page.getByRole('textbox', { name: 'Draft title' }).fill('A small observation');
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await editor.fill('Good writing starts with paying attention.');
@@ -38,7 +45,7 @@ test('create, format, autosave, preview, copy, and restore the original draft', 
 test('Markdown import is undoable, normal paste is literal, and HTML is sanitized', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   await page.getByRole('button', { name: 'Paste as Markdown', exact: true }).click();
   await page.getByLabel('Markdown text').fill('**Hello**\n\n- A thought\n- Another thought');
   await page.getByRole('button', { name: 'Insert text', exact: true }).click();
@@ -78,7 +85,7 @@ test('native Ctrl+V keeps Google Docs formatting, collapses source whitespace, a
   context,
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await editor.fill('Before');
   await page.evaluate(async () => {
@@ -106,7 +113,7 @@ test('native Ctrl+V keeps Google Docs formatting, collapses source whitespace, a
 test('Markdown import inserts a list mid-paragraph and the result stays editable', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await editor.fill('Start end');
   await editor.press('ControlOrMeta+End');
@@ -123,7 +130,7 @@ test('Markdown import inserts a list mid-paragraph and the result stays editable
 });
 
 test('clipboard rejection offers manual copy without losing the draft', async ({ page }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   await page.getByRole('textbox', { name: 'Post content' }).fill('Keep these words.');
   await page.evaluate(() => {
     Object.defineProperty(navigator, 'clipboard', {
@@ -141,8 +148,10 @@ test('clipboard rejection offers manual copy without losing the draft', async ({
 test('marked hard breaks persist and Unicode output leaves original text editable', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
+  // A new draft focuses the editor once it is editable; filling before that can be lost.
+  await expect(editor).toBeFocused();
   await editor.fill('Hello');
   await editor.press('ControlOrMeta+a');
   await editor.press('ControlOrMeta+b');
@@ -166,7 +175,7 @@ test('marked hard breaks persist and Unicode output leaves original text editabl
 test('failed writes preserve unsaved text and prevent a draft switch until retry', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await editor.fill('Original');
   await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
@@ -197,7 +206,7 @@ test('failed writes preserve unsaved text and prevent a draft switch until retry
 test('missing active draft offers an explicit recovery without blank replacement', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   await page.getByRole('textbox', { name: 'Post content' }).fill('Remaining draft');
   await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
   await page.evaluate(() => {
@@ -213,7 +222,7 @@ test('missing active draft offers an explicit recovery without blank replacement
 });
 
 test('concurrent windows cannot silently overwrite a newer draft', async ({ page, context }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   await page.getByRole('textbox', { name: 'Post content' }).fill('Base version');
   await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
   const other = await context.newPage();
@@ -237,7 +246,7 @@ test('concurrent windows cannot silently overwrite a newer draft', async ({ page
 test('draft switching saves edits and deletion requires an explicit confirmation', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const title = page.getByRole('textbox', { name: 'Draft title' });
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await expect(editor).toBeFocused();
@@ -266,7 +275,7 @@ test('draft switching saves edits and deletion requires an explicit confirmation
 for (const width of [320, 400, 600]) {
   test(`stress content remains editable and copy stays visible at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
-    await page.getByRole('button', { name: 'Create first post' }).click();
+    await createFirstPost(page);
     const editor = page.getByRole('textbox', { name: 'Post content' });
     const sample = 'مرحبا Hello 日本語 👩‍💻 https://example.com/' + 'a'.repeat(180);
     const fixture = sample.padEnd(3000, '文');
@@ -307,7 +316,7 @@ for (const width of [320, 400, 600]) {
     page,
   }, testInfo) => {
     await page.setViewportSize({ width, height: 800 });
-    await page.getByRole('button', { name: 'Create first post' }).click();
+    await createFirstPost(page);
     await expect(page.getByRole('textbox', { name: 'Post content' })).toBeFocused();
     await page
       .getByRole('textbox', { name: 'Draft title' })
@@ -396,7 +405,7 @@ async function settled(editor: Locator, expected: { text: string; from?: number 
 test('keyboard editing: paragraphs, line breaks, marks, undo, redo, and replace', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await expect(page.getByRole('button', { name: 'Undo (Ctrl+Z)', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Clear formatting', exact: true })).toBeDisabled();
@@ -431,7 +440,7 @@ test('keyboard editing: paragraphs, line breaks, marks, undo, redo, and replace'
 });
 
 test('formatting keeps the cursor and selection stable from keys and toolbar', async ({ page }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await editor.fill('Write a clear sentence');
   // Select "clear" by placing the cursor after it and extending left.
@@ -468,7 +477,7 @@ test('formatting keeps the cursor and selection stable from keys and toolbar', a
 });
 
 test('pasting plain text over a selection stays inside the paragraph', async ({ page }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await editor.fill('Keep old words here');
   await page.keyboard.press('End');
@@ -523,7 +532,7 @@ const storedDrafts = (page: import('@playwright/test').Page) =>
 const storedDraft = async (page: import('@playwright/test').Page) => (await storedDrafts(page))[0]!;
 
 test('the counter follows the generated output, not the editor content', async ({ page }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const count = page.getByTestId('character-count').locator('.sr-only');
   const copy = page.getByRole('button', { name: 'Copy Post', exact: true });
   await expect(count).toContainText(counted('0'));
@@ -556,7 +565,7 @@ test('approaching and over-limit posts warn, still save, and copy after confirma
   context,
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   const note = page.locator('.limit-note');
   await editor.fill('a'.repeat(2899));
@@ -588,7 +597,7 @@ test('copy records the time only after success and leaves the draft untouched', 
   context,
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await editor.fill('First line\n\nSecond line');
   await editor.press('ControlOrMeta+a');
@@ -637,7 +646,7 @@ test('copy records the time only after success and leaves the draft untouched', 
 test('focus loss and page hide save pending edits before the debounce fires', async ({ page }) => {
   await page.clock.install();
   await page.reload();
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await expect(editor).toBeVisible();
   // Freeze time so neither the 300 ms debounce nor the 1,500 ms maximum wait can fire.
@@ -663,7 +672,7 @@ test('focus loss and page hide save pending edits before the debounce fires', as
 test('drafts list newest first, show the active draft, and reopen the last active one', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const title = page.getByRole('textbox', { name: 'Draft title' });
   const editor = page.getByRole('textbox', { name: 'Post content' });
   const saved = page.getByRole('status').filter({ hasText: 'Saved on this device' });
@@ -696,7 +705,7 @@ test('drafts list newest first, show the active draft, and reopen the last activ
 });
 
 test('deleting the last draft shows the empty state', async ({ page }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   await expect(page.getByRole('textbox', { name: 'Post content' })).toBeFocused();
   await page.getByRole('textbox', { name: 'Draft title' }).fill('');
   await page.getByRole('button', { name: 'Delete current draft' }).click();
@@ -711,7 +720,7 @@ test('deleting the last draft shows the empty state', async ({ page }) => {
 test('an unreadable stored draft is reported and left untouched while others stay usable', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const title = page.getByRole('textbox', { name: 'Draft title' });
   const editor = page.getByRole('textbox', { name: 'Post content' });
   const saved = page.getByRole('status').filter({ hasText: 'Saved on this device' });
@@ -784,7 +793,7 @@ test('preview shows the exact copied text, keeps its spacing, and fetches nothin
   context,
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   await expect(page.getByRole('textbox', { name: 'Post content' })).toBeFocused();
   await page.getByRole('button', { name: 'Paste as Markdown', exact: true }).click();
   await page
@@ -831,7 +840,7 @@ test('preview shows the exact copied text, keeps its spacing, and fetches nothin
 
 test('desktop or mobile preview is remembered and long posts scroll', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await expect(editor).toBeFocused();
   const paragraphs = Array.from({ length: 40 }, (_, i) => `Paragraph ${i + 1} of the post.`);
@@ -871,7 +880,7 @@ test('desktop or mobile preview is remembered and long posts scroll', async ({ p
 
 test('returning from preview keeps the content, cursor, and scroll position', async ({ page }) => {
   await page.setViewportSize({ width: 400, height: 640 });
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await expect(editor).toBeFocused();
   const paragraphs = Array.from({ length: 60 }, (_, i) => `Line ${i + 1} of a long draft.`);
@@ -907,7 +916,7 @@ test('theme follows the system by default, persists, and never interrupts editin
   await expect.poll(theme).toBe('dark');
   await page.emulateMedia({ colorScheme: 'light' });
   await expect.poll(theme).toBe('light');
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await expect(editor).toBeFocused();
   await page.keyboard.type('Half a thought');
@@ -946,7 +955,7 @@ test('theme follows the system by default, persists, and never interrupts editin
 test('Unicode output is opt-in, warns once, persists, and leaves the draft unchanged', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: 'Create first post' }).click();
+  await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
   await expect(editor).toBeFocused();
   await editor.fill('Bold idea');
