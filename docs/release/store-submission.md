@@ -40,7 +40,7 @@ Before uploading, unzip one package and confirm that `manifest.json` is at the r
 >
 > Good to know: previews and counts are estimates, and the site you paste into may render the text differently. Uninstalling the extension or clearing its storage deletes your drafts, so keep copies of important posts.
 
-The listing does not use any social network's name, logo or colours in its title, icon or images. PostNook is an independent tool, not affiliated with or endorsed by LinkedIn. If the owner chooses to mention LinkedIn in the description, use it only to describe compatibility ("for posts you publish on LinkedIn"), add that disclaimer, and make no claim of exact rendering.
+The listing title, icon and images use no social network's logo, colours or branding. The name LinkedIn appears in one place, the in-app disclaimer in `screenshot-2-preview.png` ("LinkedIn may render the pasted post differently"). The manifest `description` says "LinkedIn posts" while this listing text avoids the name, so decide on one approach and make both match before submitting. PostNook is an independent tool, not affiliated with or endorsed by LinkedIn. If the owner chooses to mention LinkedIn in the description, use it only to describe compatibility ("for posts you publish on LinkedIn"), add that disclaimer, and make no claim of exact rendering.
 
 ## Images (`docs/release/store/`, regenerate with `node scripts/store-assets.mjs`)
 
@@ -54,7 +54,7 @@ The listing does not use any social network's name, logo or colours in its title
 | `promo-small-440x280.png`    | 440×280  | Small promo tile   | Small promotional tile |
 | `promo-marquee-1400x560.png` | 1400×560 | Marquee (optional) | Large promotional tile |
 
-The screenshots show the real app with sample text. They contain no third-party branding.
+The screenshots show the real app with sample text. They contain no third-party logos or branding.
 
 ## Privacy disclosures
 
