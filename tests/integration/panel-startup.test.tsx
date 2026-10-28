@@ -34,7 +34,7 @@ describe('side panel startup', () => {
       'Default preferences are used for now',
     );
     expect(screen.getByRole('button', { name: /retry preferences/i })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /create first post/i })).toBeEnabled();
+    expect(await screen.findByRole('button', { name: /create first post/i })).toBeEnabled();
     expect(set).not.toHaveBeenCalled();
   });
 
@@ -44,7 +44,7 @@ describe('side panel startup', () => {
     );
     render(<App />);
     expect(await screen.findByText(/saved by a newer PostNook version/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create first post/i })).toBeEnabled();
+    expect(await screen.findByRole('button', { name: /create first post/i })).toBeEnabled();
     expect(screen.queryByRole('button', { name: /retry loading/i })).toBeNull();
   });
 

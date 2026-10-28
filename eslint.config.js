@@ -47,4 +47,19 @@ export default tseslint.config(
     files: ['scripts/measure-contrast.mjs'],
     languageOptions: { globals: { document: 'readonly', getComputedStyle: 'readonly' } },
   },
+  {
+    files: ['scripts/measure-performance.mjs'],
+    languageOptions: {
+      globals: {
+        window: 'readonly',
+        document: 'readonly',
+        performance: 'readonly',
+        crypto: 'readonly',
+        MutationObserver: 'readonly',
+        PerformanceObserver: 'readonly',
+        KeyboardEvent: 'readonly',
+        requestAnimationFrame: 'readonly',
+      },
+    },
+  },
 );

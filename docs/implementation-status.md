@@ -298,3 +298,20 @@ Not verified:
 - A brief default theme while the stored preference loads: the panel opens on "Opening your nook…" in the system theme, then applies a stored Light or Dark. It was not measured in the real side panel.
 - A screen reader walkthrough and a full keyboard-only journey by a person (TF-010 human checks; QA-004).
 - Real quota exhaustion; the quota path is covered by the error mapping, not by filling a disk.
+
+## E08 Quality, Security, and Compatibility
+
+| Task                               | Issue                                                | Status          | Evidence                                                                                                     |
+| ---------------------------------- | ---------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------ |
+| QA-001 test matrices               | [#31](https://github.com/kasuken/PostNook/issues/31) | Implemented     | One named case per PRD 14.1 item; quota misreporting found and fixed                                         |
+| QA-002 recovery and compatibility  | [#32](https://github.com/kasuken/PostNook/issues/32) | Partly verified | 15 scenarios mapped, native probe with restart on Chrome/Edge 156 Windows; macOS and previous majors not run |
+| QA-003 privacy and security audit  | [#33](https://github.com/kasuken/PostNook/issues/33) | Implemented     | `scripts/audit-security.mjs` in the build, manifest check, sanitization tests                                |
+| QA-004 accessibility, performance  | [#34](https://github.com/kasuken/PostNook/issues/34) | Partly verified | Automated a11y, all PRD timing targets met; human keyboard and screen-reader runs not done                   |
+| QA-005 manual LinkedIn paste tests | [#35](https://github.com/kasuken/PostNook/issues/35) | Not run         | Test sheet ready; 3,000 limit checked against LinkedIn help; needs a human tester                            |
+| E08 epic                           | [#9](https://github.com/kasuken/PostNook/issues/9)   | Open            | Waiting on QA-002, QA-004 and QA-005                                                                         |
+
+Details, measurements and the scenario mapping are in [QA evidence](testing/qa-matrix.md). The human checks are in the [manual test sheet](testing/manual-test-sheet.md).
+
+Validation (2026-10-28): typecheck, lint, format, 111 unit and integration tests, production build with the manifest check and security audit, Playwright 62 tests on Chrome and Edge, and the native probe on both browsers.
+
+Also fixed: the E07 startup test for unreadable preferences queried the Create first post button before loading finished and could fail; it now waits for it.

@@ -1,11 +1,12 @@
 {
   "channel": "msedge",
   "browserVersion": "156.0.4314.50",
-  "testedAt": "2026-10-27T21:47:53.939Z",
+  "testedAt": "2026-10-28T07:58:32.881Z",
   "nativeActionOpenedPanel": true,
   "createSaveCopyReload": true,
   "clipboardContentVerified": true,
   "browserRestartRestored": true,
+  "screenshotCaptured": true,
   "permissions": ["sidePanel", "storage"],
   "extraClipboardPermission": false
 }

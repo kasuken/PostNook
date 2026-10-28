@@ -141,11 +141,13 @@ try {
     )
     .toBe(true);
   await mkdir('docs/design/prototype', { recursive: true });
-  const screenshot = await send('Page.captureScreenshot', { format: 'png' });
-  await writeFile(
-    `docs/design/prototype/${channel}-native.png`,
-    Buffer.from(screenshot.data, 'base64'),
-  );
+  // Evidence only: a headless panel behind the fronted tab may never paint a frame to capture.
+  const screenshot = await send('Page.captureScreenshot', { format: 'png' }).catch(() => null);
+  if (screenshot)
+    await writeFile(
+      `docs/design/prototype/${channel}-native.png`,
+      Buffer.from(screenshot.data, 'base64'),
+    );
   const manifest = await worker.evaluate(() => chrome.runtime.getManifest());
   const version = context.browser().version();
   await context.close();
@@ -168,6 +170,7 @@ try {
     createSaveCopyReload: true,
     clipboardContentVerified: true,
     browserRestartRestored: true,
+    screenshotCaptured: Boolean(screenshot),
     permissions: manifest.permissions,
     extraClipboardPermission: false,
   };

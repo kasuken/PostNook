@@ -34,7 +34,7 @@ The worker records a panel setup error and an action badge on failure. A unit te
 - Chrome 116, previous-major releases, macOS, and managed browser policies.
 - Hands-on screen-reader operation, complete keyboard-only user journeys, actual 200% browser zoom, and three-writer formative review.
 - Manual LinkedIn paste/rendering, Unicode count semantics, and platform policy review. No automated LinkedIn interaction was performed.
-- Reference-hardware performance targets, arbitrary storage corruption, power-loss behavior, store installation/update, and marketplace acceptance.
+- Arbitrary storage corruption, power-loss behavior, store installation/update, and marketplace acceptance. Performance targets were measured on the development laptop on 2026-10-28 ([QA evidence](qa-matrix.md)).
 
 These remain owned by existing feature/QA/release tasks. A localhost UI test is not treated as proof of native panel behavior; the native probe supplies that separate evidence.
 

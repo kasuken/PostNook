@@ -47,9 +47,16 @@ export function migrateDraftV1(raw: unknown): Draft {
   validateDraft(next);
   return next;
 }
+// Matched by name, not class: DOMException is not an Error in every realm, and Dexie wraps an
+// aborted transaction's quota error in AbortError.inner.
+function isQuota(error: unknown, depth = 0): boolean {
+  if (!error || typeof error !== 'object' || depth > 3) return false;
+  const { name, inner } = error as { name?: unknown; inner?: unknown };
+  return (typeof name === 'string' && /quota/i.test(name)) || isQuota(inner, depth + 1);
+}
 function storageError(error: unknown): never {
   if (error instanceof DraftError) throw error;
-  if (error instanceof Error && /quota/i.test(error.name))
+  if (isQuota(error))
     throw new DraftError(
       'quota',
       'Device storage is full. Keep a copy of your post, free some space, and retry.',
