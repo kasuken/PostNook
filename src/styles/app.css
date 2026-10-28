@@ -631,8 +631,19 @@ legend {
   padding: 20px;
   margin-inline: auto;
 }
+.preview-post:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.preview-post.desktop {
+  max-width: 555px;
+}
 .preview-post.mobile {
   max-width: 320px;
+}
+.preview-post.mobile .preview-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 .preview-author {
   display: flex;
@@ -667,10 +678,19 @@ legend {
   line-height: 1.7;
 }
 .preview-note {
-  margin-top: 18px;
+  margin-bottom: 14px;
   text-align: center;
   font-size: 0.6875rem;
   color: var(--muted);
+}
+.preview-error {
+  max-width: 555px;
+  margin-inline: auto;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 0.8125rem;
 }
 .modal {
   color: var(--ink);

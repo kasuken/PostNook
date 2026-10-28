@@ -216,3 +216,39 @@ Not verified:
 - Flush when the real side panel is closed. The `pagehide` path is tested in a tab; whether Chrome and Edge finish the IndexedDB write as the panel closes was not measured.
 - A browser restart after this epic's changes; restart persistence relies on the TF-004 probe.
 - Two side panels in two real browser windows; the conflict test uses two tabs on the dev server.
+
+## E06 Preview
+
+| Story            | Issue                                                | Status      | Evidence                                                                                                       |
+| ---------------- | ---------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
+| US-011 preview   | [#21](https://github.com/kasuken/PostNook/issues/21) | Implemented | Serialized output shown verbatim, remembered desktop/mobile choice, editor scroll and cursor kept, error state |
+| E06 Preview epic | [#7](https://github.com/kasuken/PostNook/issues/7)   | Implemented | Single child US-011 closed                                                                                     |
+
+US-011 acceptance mapping:
+
+- AC-011.1: Write and Preview switch in the view bar (e2e).
+- AC-011.2: Desktop preview and Mobile preview buttons with `aria-pressed`; the choice is stored as `previewMode` and survives a reload (e2e, component test). Desktop caps the card at 555 px and mobile at 320 px with slightly smaller type. In a 320 px panel the two look almost the same, because the panel itself is narrower than a desktop feed.
+- AC-011.3: the preview shows the same `serializePost` string used by the counter and clipboard. The e2e test compares the preview's `textContent` exactly with the text read back from the clipboard.
+- AC-011.4: a fixture with a hard break, paragraphs, bullets, a nested bullet and a numbered list is compared character for character, including blank lines and indentation. `toHaveText` normalizes whitespace, so it is not used for this check.
+- AC-011.5: no Mathematical Alphanumeric characters appear in plain mode; after choosing Unicode styling the bold and italic words change, and switching back restores the plain text (e2e).
+- AC-011.6: 40 paragraphs at 320 px: the pane scrolls, End on the focusable post reaches the bottom, and the page has no horizontal overflow (e2e).
+- AC-011.7: returning to Write keeps the content, the cursor position and the editor's scroll offset. The hidden pane used to lose its scroll offset (900 px fell to 54 px with the fix removed). The editor now remembers and restores the offset, and Write uses ProseMirror's own focus, which restores the selection without scrolling to it (e2e).
+- AC-011.8: "LinkedIn may render the pasted post differently. You’ll paste and publish it yourself." It now sits above the post, so it stays in view for long posts, and it is the post's accessible description.
+- AC-011.9: the preview is built only from the serialized text: no images, no remote avatar, no LinkedIn assets or branding. The e2e test records every request while previewing and switching modes and finds none outside the dev-server origin.
+- Error state: a document that fails validation shows a message instead of an empty post (component test).
+- The estimated "see more" boundary was not added. LinkedIn's truncation depends on lines, width and device, and there is no testable approximation.
+
+Validation (2026-10-28):
+
+- Typecheck, lint and format checks passed.
+- 71 unit and integration tests passed.
+- Production build and manifest check passed (existing bundle-size advisory).
+- Playwright: 58 tests on installed Chrome and Edge, two full passing runs. The new preview tests and the 320 px stress test were repeated 8 times on each browser.
+- One full run failed the 400 px layout test once on Chrome and the failure was not reproduced in 10 repeats. That test typed right after creating a draft, the focus race described under E05, and now waits for focus first; the cause was not confirmed.
+- Axe (WCAG 2.2 AA tags) reports no violations in the preview.
+
+Not verified:
+
+- How LinkedIn itself renders the post; this is covered by QA-005.
+- The preview inside the real side panel; tests use the dev server in a tab.
+- Browsers other than the installed Chrome and Edge 156.

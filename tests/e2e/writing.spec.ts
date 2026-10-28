@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import type { Editor } from '@tiptap/react';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -308,6 +308,7 @@ for (const width of [320, 400, 600]) {
   }, testInfo) => {
     await page.setViewportSize({ width, height: 800 });
     await page.getByRole('button', { name: 'Create first post' }).click();
+    await expect(page.getByRole('textbox', { name: 'Post content' })).toBeFocused();
     await page
       .getByRole('textbox', { name: 'Draft title' })
       .fill('A small observation about creative work');
@@ -769,4 +770,130 @@ test('an unreadable stored draft is reported and left untouched while others sta
     damagedId,
   );
   expect(kept).toMatchObject({ title: 'Damaged draft', schemaVersion: 99 });
+});
+
+async function importMarkdown(page: Page, markdown: string) {
+  await page.getByRole('button', { name: 'Paste as Markdown', exact: true }).click();
+  await page.getByLabel('Markdown text').fill(markdown);
+  await page.getByRole('button', { name: 'Insert text', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
+}
+
+test('preview shows the exact copied text, keeps its spacing, and fetches nothing', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  await expect(page.getByRole('textbox', { name: 'Post content' })).toBeFocused();
+  await page.getByRole('button', { name: 'Paste as Markdown', exact: true }).click();
+  await page
+    .getByLabel('Markdown text')
+    .fill(
+      '**Opening** line  \nwith a break\n\nSecond paragraph\n\n- First\n- Second\n  - Nested\n\n1. One\n2. Two\n\nClosing *thought*',
+    );
+  await page.getByRole('button', { name: 'Insert text', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
+  const origin = new URL(page.url()).origin;
+  const external: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).origin !== origin) external.push(request.url());
+  });
+  await page.getByRole('button', { name: 'Preview', exact: true }).click();
+  // textContent, not toHaveText, so whitespace and blank lines are compared exactly.
+  const raw = () => page.locator('.preview-text').evaluate((el) => el.textContent);
+  const expected =
+    'Opening line\nwith a break\n\nSecond paragraph\n\n• First\n• Second\n  • Nested\n\n1. One\n2. Two\n\nClosing thought';
+  expect(await raw()).toBe(expected);
+  await page.getByRole('button', { name: 'Copy Post', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Copied!', exact: true })).toBeVisible();
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied.replace(/\r\n/g, '\n')).toBe(await raw());
+  // Unicode styling appears only once it is selected, and leaves again with plain text.
+  expect(await raw()).not.toMatch(/[\u{1D400}-\u{1D7FF}]/u);
+  await page.getByLabel('Output mode').selectOption('unicode');
+  await page.getByRole('button', { name: 'Use Unicode styling', exact: true }).click();
+  await expect(page.locator('.preview-text')).toContainText('𝐎𝐩𝐞𝐧𝐢𝐧𝐠');
+  await expect(page.locator('.preview-text')).toContainText('Closing 𝑡ℎ𝑜𝑢𝑔ℎ𝑡');
+  await page.getByLabel('Output mode').selectOption('plain');
+  expect(await raw()).toBe(expected);
+  await expect(page.getByText('LinkedIn may render the pasted post differently.')).toBeVisible();
+  await page.getByRole('button', { name: 'Mobile preview', exact: true }).click();
+  await expect(page.locator('.preview-post')).toHaveClass(/mobile/);
+  expect(await raw()).toBe(expected);
+  const result = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+    .analyze();
+  expect(result.violations).toEqual([]);
+  expect(external).toEqual([]);
+  await expect(page.locator('.preview-pane img, .preview-pane iframe')).toHaveCount(0);
+});
+
+test('desktop or mobile preview is remembered and long posts scroll', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await expect(editor).toBeFocused();
+  const paragraphs = Array.from({ length: 40 }, (_, i) => `Paragraph ${i + 1} of the post.`);
+  await importMarkdown(page, paragraphs.join('\n\n'));
+  await page.getByRole('button', { name: 'Preview', exact: true }).click();
+  const desktop = page.getByRole('button', { name: 'Desktop preview', exact: true });
+  const mobile = page.getByRole('button', { name: 'Mobile preview', exact: true });
+  await expect(desktop).toHaveAttribute('aria-pressed', 'true');
+  await mobile.click();
+  await expect(mobile).toHaveAttribute('aria-pressed', 'true');
+  await expect(desktop).toHaveAttribute('aria-pressed', 'false');
+  const pane = page.locator('.preview-pane');
+  expect(await pane.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+  // Keyboard scrolling: focus the post and press End.
+  await page.getByRole('article', { name: 'Post text preview' }).focus();
+  await page.keyboard.press('End');
+  await expect
+    .poll(() => pane.evaluate((el) => Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop)))
+    .toBeLessThan(2);
+  expect(
+    await page
+      .locator('.preview-text')
+      .evaluate(
+        (el) =>
+          el.getBoundingClientRect().bottom <=
+          el.closest('section')!.getBoundingClientRect().bottom,
+      ),
+  ).toBe(true);
+  await expect(page.locator('.preview-text')).toContainText(/Paragraph 40 of the post\.$/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.reload();
+  await page.getByRole('button', { name: 'Preview', exact: true }).click();
+  await expect(page.locator('.preview-post')).toHaveClass(/mobile/);
+  await desktop.click();
+  await expect(page.locator('.preview-post')).toHaveClass(/desktop/);
+});
+
+test('returning from preview keeps the content, cursor, and scroll position', async ({ page }) => {
+  await page.setViewportSize({ width: 400, height: 640 });
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await expect(editor).toBeFocused();
+  const paragraphs = Array.from({ length: 60 }, (_, i) => `Line ${i + 1} of a long draft.`);
+  await importMarkdown(page, paragraphs.join('\n\n'));
+  // Put the cursor near the top, then scroll the reading position well away from it.
+  await editor.evaluate((el) => {
+    (el as HTMLElement & { editor: Editor }).editor.commands.setTextSelection(30);
+  });
+  await settled(editor, { text: '', from: 30 });
+  const scroller = page.locator('.writing-scroll');
+  await scroller.evaluate((el) => {
+    el.scrollTop = 900;
+  });
+  await expect.poll(() => scroller.evaluate((el) => el.scrollTop)).toBeGreaterThan(400);
+  const before = await scroller.evaluate((el) => el.scrollTop);
+  await page.getByRole('button', { name: 'Preview', exact: true }).click();
+  await expect(page.locator('.preview-text')).toContainText('Line 60 of a long draft.');
+  await page.getByRole('button', { name: 'Write', exact: true }).click();
+  await expect(editor).toBeFocused();
+  await settled(editor, { text: '', from: 30 });
+  expect(await scroller.evaluate((el) => el.scrollTop)).toBe(before);
+  await expect(editor).toHaveText(paragraphs.join(''));
+  await page.keyboard.type('X');
+  await expect(editor.locator('p').nth(1)).toHaveText('LineX 2 of a long draft.');
 });

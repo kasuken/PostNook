@@ -235,9 +235,8 @@ export function App() {
     });
   }
   const currentDocument = save?.draft.content ?? emptyDocument();
-  const text = validateDocument(currentDocument)
-    ? serializePost(currentDocument, settings.outputMode)
-    : '';
+  const serializable = validateDocument(currentDocument);
+  const text = serializable ? serializePost(currentDocument, settings.outputMode) : '';
   const count = countCharacters(text);
   const limit = getLimitStatus(count);
   async function copy(confirmed = false) {
@@ -495,7 +494,11 @@ export function App() {
               aria-pressed={!preview}
               onClick={() => {
                 setPreview(false);
-                requestAnimationFrame(() => editor.current?.commands.focus());
+                // ProseMirror's own focus restores the selection at once without scrolling to
+                // it, so the reading position the editor restored is kept.
+                requestAnimationFrame(() => {
+                  if (editor.current && !editor.current.isDestroyed) editor.current.view.focus();
+                });
               }}
             >
               <PenLine size={15} />
@@ -552,6 +555,7 @@ export function App() {
             {preview && (
               <PostPreview
                 text={text}
+                failed={!serializable}
                 mode={settings.previewMode}
                 onMode={(mode) => updateSettings({ ...settingsRef.current, previewMode: mode })}
               />

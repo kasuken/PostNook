@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import type { EditorProps } from '@tiptap/pm/view';
 import { useEditor, useEditorState, EditorContent, type Editor } from '@tiptap/react';
 import {
@@ -131,6 +131,12 @@ export function WritingEditor({
       clear: e ? hasFormatting(e) : false,
     }),
   });
+  // A hidden pane loses its scroll offset, so remember it and put it back when shown again.
+  const scroller = useRef<HTMLDivElement>(null);
+  const scrollTop = useRef(0);
+  useLayoutEffect(() => {
+    if (!hidden && scroller.current) scroller.current.scrollTop = scrollTop.current;
+  }, [hidden]);
   useEffect(() => {
     // A temporary input lock is not a document edit or a new storage revision.
     editor?.setEditable(editable, false);
@@ -208,7 +214,13 @@ export function WritingEditor({
           </IconButton>
         </div>
       </fieldset>
-      <div className="writing-scroll">
+      <div
+        className="writing-scroll"
+        ref={scroller}
+        onScroll={(event) => {
+          if (!hidden) scrollTop.current = event.currentTarget.scrollTop;
+        }}
+      >
         <EditorContent editor={editor} />
       </div>
       <p className="editor-note" id={noteId}>
