@@ -34,7 +34,7 @@ The migration spike tests `migrateDraftV1` inside a transaction with preserved c
 
 ## Output and errors
 
-`serializePost(document, outputMode)` is shared by preview, counter, and clipboard. Paragraphs use two newlines, hard breaks one, bullets `• `, and ordered items sequential numbering. Excessive blank lines are normalized. Plain mode ignores emphasis marks; Unicode mode transforms supported marked Latin letters and protects URL, hashtag, and mention spans across mark boundaries. Original JSON stays unchanged. Unsupported characters remain ordinary text. Unicode accessibility and external rendering limitations are explained before use.
+`serializePost(document, outputMode)` is shared by preview, counter, and clipboard. Paragraphs use two newlines, hard breaks one, bullets `• `, and ordered items sequential numbering. Nested lists, extra item paragraphs and line breaks inside an item are indented under their marker. Empty list items are left out, and excess blank lines and trailing spaces are normalized. Plain mode ignores emphasis marks; Unicode mode transforms supported marked Latin letters and protects URL, hashtag, and mention spans across mark boundaries. Original JSON stays unchanged. Unsupported characters remain ordinary text. Unicode accessibility and external rendering limitations are explained before use.
 
 The 3,000 limit and 2,900 warning use UTF-16 code units, not a verified LinkedIn counting algorithm. Storage errors are typed as conflict, unavailable, quota, invalid, or missing. Save/copy success is announced only after promises resolve. Clipboard failure provides selectable text. A missing active draft requires an explicit action to open remaining drafts. Panel setup retry updates its status without reloading the editor.
 

@@ -115,3 +115,57 @@ Not verified:
 - A real clipboard read failure in a browser; browsers supply paste data synchronously, so the failure path is tested with a throwing `getData` in jsdom.
 - Word multi-level list nesting (levels are flattened into one list) and the bundled Playwright Chromium project.
 - Manual LinkedIn paste behavior, which is covered by QA-005.
+
+## E04 LinkedIn Output
+
+| Story                    | Issue                                                | Status      | Evidence                                                                                                  |
+| ------------------------ | ---------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------- |
+| US-006 publishing text   | [#16](https://github.com/kasuken/PostNook/issues/16) | Implemented | Pure `serializePost`, empty items and blank lines normalized, nested and multi-line items indented        |
+| US-007 character counter | [#17](https://github.com/kasuken/PostNook/issues/17) | Implemented | Count of serialized output, locale-consistent limit, always-mounted warning live region, over-limit saves |
+| US-008 copy post         | [#18](https://github.com/kasuken/PostNook/issues/18) | Implemented | User-triggered `writeText`, confirmation, manual fallback, copy time recorded only after success          |
+| E04 LinkedIn Output epic | [#5](https://github.com/kasuken/PostNook/issues/5)   | Implemented | All three children closed                                                                                 |
+
+US-006 acceptance mapping:
+
+- AC-006.1 deterministic: repeated runs give identical text (`tests/unit/serializer.test.ts`).
+- AC-006.2 empty output: an empty document, an empty list item and whitespace-only paragraphs all produce `''`. Before this epic, an empty list item copied as a lone `•` and enabled Copy Post.
+- AC-006.3 spacing: two newlines between paragraphs, one per hard break, one blank line between paragraphs and lists, excess blank lines collapsed, trailing spaces removed.
+- AC-006.4 lists: `• ` bullets and sequential `1.`, `2.` numbers. Nested lists, extra item paragraphs and line breaks inside an item are indented under their marker (unit, and e2e clipboard read-back).
+- AC-006.5 emoji and international text kept (unit, stress e2e).
+- AC-006.6 no markup: marks emit no `<`, `*` or `_`. Literal `**x**` and `<b>` typed by the writer stay as typed.
+- AC-006.7 one service: preview, counter and clipboard all use the same `text` value from `serializePost`.
+- AC-006.8 mode change: the e2e test compares the stored document before and after switching to Unicode and back.
+- AC-006.9 malformed input: `serializePost` throws a safe message, and the app shows an empty output instead of crashing. The editor and storage reject invalid documents before they reach the serializer.
+- AC-006.10 no LinkedIn interaction: `scripts/validate-manifest.mjs` enforces only `sidePanel` and `storage`, no host permissions, no content scripts and `connect-src 'none'`.
+
+US-007 acceptance mapping:
+
+- AC-007.1, .2 and .6: the counter uses `countCharacters(serializePost(...))`. The e2e test shows a bullet marker adding two characters, and Unicode bold raising the count from 5 to 10 and back.
+- AC-007.3: the limit is shown in the browser locale, together with the count. Before this epic, Edge showed `3'000 / 3,000`.
+- AC-007.4 and .5: the approaching note appears at 2,900 and the over-limit note and error color at 3,001 (e2e). The note is a live region that stays mounted, so the change is announced.
+- AC-007.7: over-limit content reaches "Saved on this device" and survives a reload (e2e).
+- AC-007.8: Copy Post opens a warning, and **Copy anyway** copies the full text (e2e clipboard read-back).
+- The count is described as an estimate in the label, the tooltip and the warning dialog.
+
+US-008 acceptance mapping:
+
+- AC-008.1 to .4: the Copy Post button calls `navigator.clipboard.writeText` from the click and shows `Copied!` plus a status announcement (e2e).
+- AC-008.5: a rejected or unavailable clipboard shows an actionable error and a manual select-and-copy dialog (unit and e2e).
+- AC-008.6 and .7: after copying, the editor text, stored content and revision are unchanged (e2e).
+- AC-008.8: `lastCopiedAt` stays `null` after a rejected copy and is set after a successful one (e2e reads IndexedDB).
+- AC-008.9: Copy Post is disabled for empty output, and the clipboard service refuses blank text (unit and e2e).
+- AC-008.10: no extra permission was added; see AC-006.10.
+
+Validation (2026-10-27):
+
+- Typecheck, lint and format checks passed.
+- 65 unit and integration tests passed.
+- Production build and manifest check passed (existing bundle-size advisory).
+- Playwright: 44 tests on installed Chrome and Edge. The three new output tests were repeated 5 times on each browser.
+
+Not verified:
+
+- LinkedIn's real character counting, which is why the count is shown as an estimate.
+- How lists, indentation and Unicode styling look after a manual paste into LinkedIn (QA-005).
+- Chrome 116, the bundled Playwright Chromium project, and macOS.
+- Windows reads the clipboard back with CRLF line endings; the e2e test normalizes them. How LinkedIn handles them is part of QA-005.

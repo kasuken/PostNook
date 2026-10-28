@@ -458,7 +458,7 @@ legend {
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
-.character-count span {
+.character-count [aria-hidden] > span {
   color: var(--muted);
 }
 .character-count.over,
@@ -472,6 +472,9 @@ legend {
 .limit-note {
   font-size: 0.75rem;
   margin-bottom: 12px;
+}
+.limit-note:empty {
+  margin-bottom: 0;
 }
 .publish-row {
   display: flex;

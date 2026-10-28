@@ -20,7 +20,12 @@ import { IndexedDraftRepository } from '../storage/drafts';
 import { BrowserSettings, isExtension } from '../browser/settings';
 import { BrowserClipboard } from '../browser/clipboard';
 import { AutosaveService, type SaveSnapshot } from '../services/autosave';
-import { serializePost, getLimitStatus } from '../services/serializer';
+import {
+  serializePost,
+  countCharacters,
+  getLimitStatus,
+  LINKEDIN_LIMIT,
+} from '../services/serializer';
 import { MarkedAdapter } from '../services/markdown';
 import { WritingEditor } from '../features/editor/WritingEditor';
 import { insertDocument } from '../features/editor/insert';
@@ -216,7 +221,8 @@ export function App() {
   const text = validateDocument(currentDocument)
     ? serializePost(currentDocument, settings.outputMode)
     : '';
-  const limit = getLimitStatus(text.length);
+  const count = countCharacters(text);
+  const limit = getLimitStatus(count);
   async function copy(confirmed = false) {
     if (copyState === 'copying') return;
     if (limit === 'over' && !confirmed) {
@@ -532,19 +538,26 @@ export function App() {
               <SaveIndicator status={save.status} />
               <span
                 className={`character-count ${limit}`}
-                aria-label={`${text.length} estimated characters out of 3000`}
+                data-testid="character-count"
+                title="Estimated characters in the copied post. LinkedIn may count differently."
               >
-                {text.length.toLocaleString()}
-                <span> / 3,000</span>
+                <span aria-hidden="true">
+                  {count.toLocaleString()}
+                  <span> / {LINKEDIN_LIMIT.toLocaleString()}</span>
+                </span>
+                <span className="sr-only">
+                  {count.toLocaleString()} of {LINKEDIN_LIMIT.toLocaleString()} estimated characters
+                </span>
               </span>
             </div>
-            {limit !== 'normal' && (
-              <p className={`limit-note ${limit}`} role="status">
-                {limit === 'over'
-                  ? 'Over the estimated limit. You can still save or copy.'
-                  : 'You’re close to the estimated character limit.'}
-              </p>
-            )}
+            {/* Always mounted so screen readers announce the text when it appears. */}
+            <p className={`limit-note ${limit}`} role="status">
+              {limit === 'over'
+                ? 'Over the estimated limit. You can still save or copy.'
+                : limit === 'approaching'
+                  ? 'You’re close to the estimated character limit.'
+                  : ''}
+            </p>
             <div className="publish-row">
               <label className="output-select">
                 <span>Copy as</span>
@@ -713,7 +726,7 @@ export function App() {
       {dialog === 'over-limit' && (
         <Modal title="Your post is over the estimate" onClose={() => setDialog(null)}>
           <p>
-            This output is {text.length.toLocaleString()} UTF-16 characters. LinkedIn may reject it
+            This output is an estimated {count.toLocaleString()} characters. LinkedIn may reject it
             or count characters differently.
           </p>
           <div className="modal-actions">

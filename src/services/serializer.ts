@@ -53,32 +53,40 @@ export function serializePost(document: PostDocument, mode: OutputMode = 'plain'
     throw new Error('This draft contains unsupported content. Your original has not been changed.');
   function block(n: PostNode, depth = 0): string {
     if (n.type === 'paragraph') return inline(n.content ?? [], mode);
-    if (n.type === 'bulletList' || n.type === 'orderedList')
-      return (n.content ?? [])
-        .map((item, index) => {
-          const children = item.content ?? [];
-          const prefix = n.type === 'bulletList' ? '• ' : `${index + 1}. `;
-          return (
-            '  '.repeat(depth) +
-            prefix +
-            children
-              .map((child, i) =>
+    if (n.type === 'bulletList' || n.type === 'orderedList') {
+      const indent = '  '.repeat(depth + 1);
+      return (
+        (n.content ?? [])
+          .map((item) =>
+            (item.content ?? [])
+              .map((child) =>
                 child.type === 'paragraph'
-                  ? (i ? '\n' + '  '.repeat(depth + 1) : '') + block(child, depth)
-                  : '\n' + block(child, depth + 1),
+                  ? indent + block(child).replace(/\n/g, '\n' + indent)
+                  : block(child, depth + 1),
               )
-              .join('')
-          );
-        })
-        .join('\n');
+              .filter((part) => part.trim())
+              .join('\n')
+              .slice(indent.length),
+          )
+          // An empty item would copy as a lone marker, so it is left out.
+          .filter((body) => body.trim())
+          .map(
+            (body, index) =>
+              '  '.repeat(depth) + (n.type === 'bulletList' ? '• ' : `${index + 1}. `) + body,
+          )
+          .join('\n')
+      );
+    }
     return '';
   }
   return document.content
     .map((n) => block(n))
     .join('\n\n')
+    .replace(/[^\S\n]+$/gm, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 export const countCharacters = (text: string) => text.length;
+export const LINKEDIN_LIMIT = 3000;
 export const getLimitStatus = (count: number) =>
-  count > 3000 ? 'over' : count >= 2900 ? 'approaching' : 'normal';
+  count > LINKEDIN_LIMIT ? 'over' : count >= LINKEDIN_LIMIT - 100 ? 'approaching' : 'normal';

@@ -5,6 +5,7 @@ import {
   textDocument,
   validateDocument,
   type PostDocument,
+  type PostNode,
 } from '../../src/domain/document';
 
 describe('publishing text', () => {
@@ -63,6 +64,65 @@ describe('publishing text', () => {
       '𝐇𝐞𝐥𝐥𝐨 https://example.com #hello @writer 日本語 👋',
     );
     expect(serializePost(doc, 'unicode')).toBe(serializePost(doc, 'unicode'));
+  });
+  const t = (text: string, bold = false): PostNode => ({
+    type: 'text',
+    text,
+    ...(bold ? { marks: [{ type: 'bold' as const }] } : {}),
+  });
+  const p = (...content: PostNode[]): PostNode => ({ type: 'paragraph', content });
+  const li = (...content: PostNode[]): PostNode => ({ type: 'listItem', content });
+  const doc = (...content: PostNode[]): PostDocument => ({ type: 'doc', content });
+  it('indents nested lists, extra item paragraphs, and line breaks inside items', () => {
+    const nested = doc(
+      p(t('Intro')),
+      {
+        type: 'bulletList',
+        content: [
+          li(p(t('a'), { type: 'hardBreak' }, t('b')), p(t('c')), {
+            type: 'orderedList',
+            content: [li(p(t('n1'))), li(p(t('n2')))],
+          }),
+          li(p(t('d'))),
+        ],
+      },
+      p(t('Outro')),
+    );
+    expect(serializePost(nested)).toBe('Intro\n\n• a\n  b\n  c\n  1. n1\n  2. n2\n• d\n\nOutro');
+  });
+  it('drops empty list items and whitespace-only paragraphs so nothing copies as a stray marker', () => {
+    expect(serializePost(doc({ type: 'bulletList', content: [li(p())] }))).toBe('');
+    expect(
+      serializePost(
+        doc({
+          type: 'orderedList',
+          content: [li(p(t('x'))), li(p()), li(p(t('  '))), li(p(t('y')))],
+        }),
+      ),
+    ).toBe('1. x\n2. y');
+    expect(serializePost(doc(p(t('A')), p(t('   ')), p(), p(), p(t('B  '))))).toBe('A\n\nB');
+    expect(
+      serializePost(doc(p({ type: 'hardBreak' }, { type: 'hardBreak' }, t('B')), p(), p())),
+    ).toBe('B');
+  });
+  it('emits no markup for marks and keeps literal Markdown and HTML that the writer typed', () => {
+    const marked = doc(
+      p(t('Bold', true), t(' and '), { ...t('italic'), marks: [{ type: 'italic' }] }),
+    );
+    expect(serializePost(marked)).toBe('Bold and italic');
+    expect(serializePost(marked)).not.toMatch(/<|\*|_/);
+    expect(serializePost(doc(p(t('**x** <b>y</b>'))))).toBe('**x** <b>y</b>');
+  });
+  it('generates the same text for the same document and mode', () => {
+    const sample = doc(p(t('Hello', true), t(' 👋 ¡Hola! Привет مرحبا')));
+    const runs = Array.from({ length: 5 }, () => serializePost(sample, 'unicode'));
+    expect(new Set(runs).size).toBe(1);
+    expect(serializePost(sample)).toBe('Hello 👋 ¡Hola! Привет مرحبا');
+  });
+  it('recounts after Unicode styling, which uses more UTF-16 units than plain text', () => {
+    const sample = doc(p(t('Bold', true)));
+    expect(countCharacters(serializePost(sample))).toBe(4);
+    expect(countCharacters(serializePost(sample, 'unicode'))).toBe(8);
   });
   it.each([
     null,

@@ -487,3 +487,135 @@ test('pasting plain text over a selection stays inside the paragraph', async ({ 
   await expect(editor).toContainText('Heading');
   await expect(editor).toContainText('code()');
 });
+
+// The counter follows the browser locale, so any thousands separator is accepted.
+const counted = (n: string) =>
+  new RegExp(`^${n.replace(/\B(?=(\d{3})+$)/g, '\\D?')} of 3\\D?000 estimated characters$`);
+type StoredDraft = { content: unknown; revision: number; lastCopiedAt: string | null };
+const storedDraft = (page: import('@playwright/test').Page) =>
+  page.evaluate(
+    () =>
+      new Promise<StoredDraft>((resolve, reject) => {
+        const open = indexedDB.open('postnook');
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const all = open.result.transaction('drafts').objectStore('drafts').getAll();
+          all.onsuccess = () => {
+            open.result.close();
+            resolve(all.result[0] as StoredDraft);
+          };
+        };
+      }),
+  );
+
+test('the counter follows the generated output, not the editor content', async ({ page }) => {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const count = page.getByTestId('character-count').locator('.sr-only');
+  const copy = page.getByRole('button', { name: 'Copy Post', exact: true });
+  await expect(count).toContainText(counted('0'));
+  await expect(copy).toBeDisabled();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await editor.fill('Hello');
+  await expect(count).toContainText(counted('5'));
+  await page.getByRole('button', { name: 'Bullet list', exact: true }).click();
+  // The bullet marker and its space are part of the copied text.
+  await expect(count).toContainText(counted('7'));
+  await page.getByRole('button', { name: 'Bullet list', exact: true }).click();
+  await editor.press('ControlOrMeta+a');
+  await editor.press('ControlOrMeta+b');
+  await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
+  const before = await storedDraft(page);
+  await page.getByLabel('Output mode').selectOption('unicode');
+  await page.getByRole('button', { name: 'Use Unicode styling', exact: true }).click();
+  await expect(count).toContainText(counted('10'));
+  await page.getByLabel('Output mode').selectOption('plain');
+  await expect(count).toContainText(counted('5'));
+  expect((await storedDraft(page)).content).toEqual(before.content);
+  await editor.press('ControlOrMeta+a');
+  await editor.press('Delete');
+  await expect(count).toContainText(counted('0'));
+  await expect(copy).toBeDisabled();
+});
+
+test('approaching and over-limit posts warn, still save, and copy after confirmation', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  const note = page.locator('.limit-note');
+  await editor.fill('a'.repeat(2899));
+  await expect(note).toBeEmpty();
+  await editor.press('End');
+  await editor.pressSequentially('b');
+  await expect(note).toHaveText('You’re close to the estimated character limit.');
+  const over = 'a'.repeat(2900) + 'é👋'.repeat(33) + 'z';
+  await editor.fill(over);
+  await expect(page.getByTestId('character-count').locator('.sr-only')).toContainText(
+    counted('3000'),
+  );
+  await editor.press('End');
+  await editor.pressSequentially('!');
+  await expect(note).toHaveText('Over the estimated limit. You can still save or copy.');
+  await expect(page.getByTestId('character-count')).toHaveClass(/over/);
+  await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
+  await page.reload();
+  await expect(editor).toHaveText(over + '!');
+  await page.getByRole('button', { name: 'Copy Post', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveAccessibleName('Your post is over the estimate');
+  await page.getByRole('button', { name: 'Copy anyway', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Copied!', exact: true })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(over + '!');
+});
+
+test('copy records the time only after success and leaves the draft untouched', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await editor.fill('First line\n\nSecond line');
+  await editor.press('ControlOrMeta+a');
+  await page.getByRole('button', { name: 'Numbered list', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
+  const before = await storedDraft(page);
+  expect(before.lastCopiedAt).toBeNull();
+
+  await page.evaluate(() => {
+    const native = navigator.clipboard;
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: (text: string) =>
+          (window as unknown as { failCopy?: boolean }).failCopy === false
+            ? native.writeText(text)
+            : Promise.reject(new DOMException('Denied', 'NotAllowedError')),
+        readText: () => native.readText(),
+      },
+    });
+  });
+  const copy = page.getByRole('button', { name: 'Copy Post', exact: true });
+  await copy.click();
+  await expect(page.getByRole('dialog')).toHaveAccessibleName('Copy your post manually');
+  await expect(page.getByText(/could not copy your post/)).toBeVisible();
+  await page.keyboard.press('Escape');
+  expect((await storedDraft(page)).lastCopiedAt).toBeNull();
+
+  await page.evaluate(() => ((window as unknown as { failCopy?: boolean }).failCopy = false));
+  await copy.click();
+  await expect(page.getByRole('button', { name: 'Copied!', exact: true })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Post copied.' })).toBeAttached();
+  await expect.poll(async () => (await storedDraft(page)).lastCopiedAt).not.toBeNull();
+  const after = await storedDraft(page);
+  expect(after.revision).toBe(before.revision);
+  expect(after.content).toEqual(before.content);
+  // The empty item between the lines is left out, and numbering stays sequential.
+  // Windows reads the clipboard back with CRLF line endings.
+  expect((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n')).toBe(
+    '1. First line\n2. Second line',
+  );
+  await expect(editor.locator('ol li')).toHaveCount(3);
+  await expect(editor).toHaveText('First lineSecond line');
+});
