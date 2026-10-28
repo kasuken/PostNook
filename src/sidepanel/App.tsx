@@ -23,6 +23,7 @@ import { AutosaveService, type SaveSnapshot } from '../services/autosave';
 import { serializePost, getLimitStatus } from '../services/serializer';
 import { MarkedAdapter } from '../services/markdown';
 import { WritingEditor } from '../features/editor/WritingEditor';
+import { insertDocument } from '../features/editor/insert';
 import { PostPreview } from '../features/preview/PostPreview';
 import { SettingsPanel } from '../features/settings/SettingsPanel';
 import { DraftList } from '../features/drafts/DraftList';
@@ -255,7 +256,14 @@ export function App() {
   function importMarkdown() {
     try {
       const doc = new MarkedAdapter().parse(markdown);
-      editor.current?.chain().focus().insertContent(doc.content).run();
+      const view = editor.current?.view;
+      // Keep the typed Markdown when there is nowhere to put it yet.
+      if (!view) {
+        setImportError('The editor is not ready yet. Your Markdown is kept; try again.');
+        return;
+      }
+      insertDocument(view, doc);
+      view.focus();
       setMarkdown('');
       setImportError('');
       setDialog(null);

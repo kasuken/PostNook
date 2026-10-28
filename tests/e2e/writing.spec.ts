@@ -73,6 +73,55 @@ test('Markdown import is undoable, normal paste is literal, and HTML is sanitize
   expect(await page.evaluate(() => 'pasteExecuted' in window)).toBe(false);
 });
 
+test('native Ctrl+V keeps Google Docs formatting, collapses source whitespace, and undoes', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await editor.fill('Before');
+  await page.evaluate(async () => {
+    const html =
+      '<b style="font-weight:normal" id="docs-internal-guid-1"><p><span style="font-weight:700">Bold</span><span style="font-weight:400"> and\n   plain</span></p><br><p><span style="font-style:italic">Second 👋 日本語</span></p></b>';
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob(['Bold and plain\n\nSecond'], { type: 'text/plain' }),
+      }),
+    ]);
+  });
+  await editor.press('ControlOrMeta+End');
+  await editor.press('Enter');
+  await editor.press('ControlOrMeta+v');
+  await expect(editor.locator('p')).toHaveText(['Before', 'Bold and plain', 'Second 👋 日本語']);
+  await expect(editor.locator('strong')).toHaveText('Bold');
+  await expect(editor.locator('em')).toHaveText('Second 👋 日本語');
+  await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
+  await editor.press('ControlOrMeta+z');
+  await expect(editor).not.toContainText('Bold');
+  await expect(editor).toContainText('Before');
+});
+
+test('Markdown import inserts a list mid-paragraph and the result stays editable', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await editor.fill('Start end');
+  await editor.press('ControlOrMeta+End');
+  for (let i = 0; i < 4; i++) await editor.press('ArrowLeft');
+  await page.getByRole('button', { name: 'Paste as Markdown', exact: true }).click();
+  await page.getByLabel('Markdown text').fill('- one\n- two');
+  await page.getByRole('button', { name: 'Insert text', exact: true }).click();
+  await expect(editor.locator('li')).toHaveText(['one', 'two']);
+  await expect(editor.locator('> p')).toHaveText(['Start', 'end']);
+  await editor.locator('li').last().click();
+  await editor.press('End');
+  await editor.pressSequentially(' edited');
+  await expect(editor.locator('li').last()).toHaveText('two edited');
+});
+
 test('clipboard rejection offers manual copy without losing the draft', async ({ page }) => {
   await page.getByRole('button', { name: 'Create first post' }).click();
   await page.getByRole('textbox', { name: 'Post content' }).fill('Keep these words.');

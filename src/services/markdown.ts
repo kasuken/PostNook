@@ -5,30 +5,47 @@ import {
   type PostDocument,
   type PostNode,
   textDocument,
+  textNodes,
   validateDocument,
 } from '../domain/document';
 import { serializePost } from './serializer';
 
 const parser = new Marked({ gfm: true, breaks: false });
+const entities = new Map<string, string>();
+// Markdown text keeps entity references such as &amp; literally; decode them as text only.
+// Each match is a lone entity in an inert document, so no markup can be created or run.
+function decodeEntities(text: string) {
+  return text.replace(/&(?:#\d{1,7}|#x[\da-f]{1,6}|[a-z][a-z\d]{1,31});/gi, (entity) => {
+    let value = entities.get(entity);
+    if (value === undefined) {
+      value = new DOMParser().parseFromString(entity, 'text/html').body.textContent || entity;
+      entities.set(entity, value);
+    }
+    return value;
+  });
+}
 function mergeText(nodes: PostNode[]): PostNode[] {
   return nodes.filter((n) => n.type !== 'text' || Boolean(n.text));
 }
 function inline(tokens: Token[], marks: Mark[] = []): PostNode[] {
   return mergeText(
     tokens.flatMap((token): PostNode[] => {
-      if (token.type === 'strong' || token.type === 'em')
-        return inline(token.tokens ?? [], [
-          ...marks,
-          { type: token.type === 'strong' ? 'bold' : 'italic' },
-        ]);
+      if (token.type === 'strong' || token.type === 'em') {
+        const type = token.type === 'strong' ? 'bold' : 'italic';
+        return inline(
+          token.tokens ?? [],
+          marks.some((m) => m.type === type) ? marks : [...marks, { type }],
+        );
+      }
       if (token.type === 'br') return [{ type: 'hardBreak' }];
       if (token.type === 'link')
         return [...inline(token.tokens ?? [], marks), { type: 'text', text: ` (${token.href})` }];
       if (token.type === 'image')
         return [{ type: 'text', text: `${token.text || 'Image'} (${token.href})` }];
       if (token.type === 'text' && token.tokens) return inline(token.tokens, marks);
-      const text = 'text' in token ? String(token.text) : token.raw;
-      return text ? [{ type: 'text', text, ...(marks.length ? { marks } : {}) }] : [];
+      // A soft line break inside a paragraph is kept as a line break, as the writer typed it.
+      if (token.type === 'text') return textNodes(decodeEntities(token.text), marks);
+      return textNodes('text' in token ? String(token.text) : token.raw, marks);
     }),
   );
 }
@@ -47,6 +64,7 @@ function blocks(tokens: Token[]): PostNode[] {
           },
         ];
       case 'list':
+        // Numbered lists always count from 1, as the published text does.
         return [
           {
             type: t.ordered ? 'orderedList' : 'bulletList',
@@ -65,7 +83,7 @@ function blocks(tokens: Token[]): PostNode[] {
           content: [{ type: 'text', text: row.map((c) => c.text).join(' | ') }],
         }));
       default:
-        return textDocument('text' in t ? String(t.text) : t.raw).content;
+        return textDocument(('text' in t ? String(t.text) : t.raw).replace(/\n+$/, '')).content;
     }
   });
 }

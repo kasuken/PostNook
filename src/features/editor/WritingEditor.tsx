@@ -1,7 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { EditorProps } from '@tiptap/pm/view';
 import { useEditor, useEditorState, EditorContent, type Editor } from '@tiptap/react';
-import { Slice } from '@tiptap/pm/model';
 import {
   Bold,
   Italic,
@@ -13,6 +12,7 @@ import {
   FileDown,
 } from 'lucide-react';
 import { editorExtensions } from './extensions';
+import { insertDocument } from './insert';
 import { IconButton } from '../../components/ui';
 import { validateDocument, type OutputMode, type PostDocument } from '../../domain/document';
 import { parseSupportedClipboardContent } from '../../services/paste';
@@ -71,22 +71,35 @@ export function WritingEditor({
         dir: 'auto',
         'aria-describedby': noteId,
       },
-      handlePaste(view, event) {
-        if (!event.clipboardData) return false;
-        try {
-          const doc = parseSupportedClipboardContent(event.clipboardData);
-          const content = view.state.schema.nodeFromJSON(doc).content;
-          // A single pasted paragraph joins the current line; lists and multiple paragraphs
-          // stay whole blocks instead of merging their first item into the surrounding text.
-          const inline = content.childCount === 1 && content.firstChild?.type.name === 'paragraph';
-          const slice = inline ? Slice.maxOpen(content) : new Slice(content, 0, 0);
-          view.dispatch(view.state.tr.replaceSelection(slice).scrollIntoView());
-        } catch (error) {
-          callbacks.current.onError(
-            error instanceof Error ? error.message : 'Paste failed. Your draft is unchanged.',
-          );
-        }
-        return true;
+      // Handled at the DOM event, before ProseMirror reads the clipboard itself, so a failed
+      // read is reported here instead of escaping as an uncaught error.
+      handleDOMEvents: {
+        paste(view, event) {
+          if (!event.clipboardData || !view.editable) return false;
+          event.preventDefault();
+          const clipboard: Record<string, string> = {};
+          try {
+            // Read once, only from this user-initiated paste event.
+            for (const type of ['text/html', 'text/plain'])
+              clipboard[type] = event.clipboardData.getData(type);
+          } catch {
+            callbacks.current.onError(
+              'The clipboard could not be read. Your draft is unchanged; try pasting again.',
+            );
+            return true;
+          }
+          try {
+            insertDocument(
+              view,
+              parseSupportedClipboardContent({ getData: (type) => clipboard[type] ?? '' }),
+            );
+          } catch (error) {
+            callbacks.current.onError(
+              error instanceof Error ? error.message : 'Paste failed. Your draft is unchanged.',
+            );
+          }
+          return true;
+        },
       },
     } satisfies EditorProps,
   }));

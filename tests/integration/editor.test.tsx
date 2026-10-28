@@ -208,5 +208,59 @@ describe('writing editor', () => {
       content: [...textDocument('Before ').content, list, ...textDocument('after').content],
     });
   });
+
+  it('reports a clipboard read failure and leaves the document unchanged', () => {
+    const { get, onError } = setup(textDocument('Keep me'));
+    const before = get().getJSON();
+    act(() => {
+      get().view.dom.dispatchEvent(
+        Object.assign(new Event('paste', { bubbles: true, cancelable: true }), {
+          clipboardData: {
+            getData: () => {
+              throw new DOMException('Read denied', 'NotAllowedError');
+            },
+          },
+        }),
+      );
+    });
+    expect(onError).toHaveBeenCalledWith(expect.stringContaining('clipboard could not be read'));
+    expect(get().getJSON()).toEqual(before);
+  });
+
+  it('undoes a paste in one step, including a paste right after typing', async () => {
+    const user = userEvent.setup();
+    const { get } = setup();
+    get().commands.focus();
+    await user.keyboard('Typed');
+    const typed = get().getJSON();
+    act(() => {
+      get().view.dom.dispatchEvent(
+        Object.assign(new Event('paste', { bubbles: true, cancelable: true }), {
+          clipboardData: {
+            getData: (type: string) => (type === 'text/html' ? '<p>One</p><p>Two</p>' : ''),
+          },
+        }),
+      );
+    });
+    expect(get().getText()).toContain('Two');
+    act(() => {
+      get().commands.undo();
+    });
+    expect(get().getJSON()).toEqual(typed);
+  });
+
+  it('keeps Markdown-looking plain text literal when pasted normally', () => {
+    const { get } = setup();
+    act(() => {
+      get().view.dom.dispatchEvent(
+        Object.assign(new Event('paste', { bubbles: true, cancelable: true }), {
+          clipboardData: {
+            getData: (type: string) => (type === 'text/plain' ? '**literal** and *this*' : ''),
+          },
+        }),
+      );
+    });
+    expect(get().getJSON()).toEqual(textDocument('**literal** and *this*'));
+  });
 });
 const paragraph = (): PostNode => ({ type: 'paragraph', content: [{ type: 'text', text: 'x' }] });

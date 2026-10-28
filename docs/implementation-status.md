@@ -71,3 +71,47 @@ Not verified:
 - The bundled Playwright Chromium project and macOS Cmd shortcuts. The labels switch to `Cmd` on Apple platforms, but this has not been tested on a Mac.
 - Screen-reader announcement of the formatting note.
 - Manual LinkedIn paste behavior, which is covered by QA-005.
+
+## E03 Markdown and Smart Paste
+
+| Story                             | Issue                                                | Status      | Evidence                                                                                              |
+| --------------------------------- | ---------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------- |
+| US-004 import Markdown            | [#14](https://github.com/kasuken/PostNook/issues/14) | Implemented | Adapter edge cases (escapes, entities, soft breaks, nested marks, inert HTML), shared undoable insert |
+| US-005 smart paste                | [#15](https://github.com/kasuken/PostNook/issues/15) | Implemented | Per-source HTML fixtures, whitespace collapse, plain-text fallback, read-failure and undo tests       |
+| E03 Markdown and Smart Paste epic | [#4](https://github.com/kasuken/PostNook/issues/4)   | Implemented | Both children closed                                                                                  |
+
+US-004 acceptance mapping:
+
+- AC-004.1 Paste as Markdown action: toolbar button and dialog (e2e `Markdown import is undoable…`).
+- AC-004.2 conversion: paragraphs, bold, italic, bullet and numbered lists, nested lists and line breaks (`tests/unit/import.test.ts`, e2e). A soft line break becomes a hard break so the post keeps the writer's lines.
+- AC-004.3 normal paste stays literal: unit, integration (`keeps Markdown-looking plain text literal…`) and e2e. The e2e caught Tiptap paste rules bolding `**literal**` during this work; insertion no longer triggers them.
+- AC-004.4 unsupported syntax readable: headings, code, links, strike, quotes, rules, images and tables stay as text.
+- AC-004.5 failures keep the draft: parsing happens before insertion; oversized input is rejected; if the editor is not ready the typed Markdown is kept.
+- AC-004.6 editable result: e2e `Markdown import inserts a list mid-paragraph and the result stays editable`.
+- AC-004.7 unit coverage: `tests/unit/import.test.ts` (adapter, round trip) and `tests/unit/serializer.test.ts`.
+- AC-004.8 nothing executed: inline and block HTML stay literal text; the result is only Tiptap JSON.
+
+US-005 acceptance mapping:
+
+- AC-005.1 and .2: `text/plain` is accepted; `text/html` is used when it carries text, with bold, italic and lists retained. Native Ctrl+V with Google Docs-style HTML is tested in e2e.
+- AC-005.3 and .4: DOMPurify allowlist with no rendered attributes; script, iframe, SVG, form, style and event attributes are removed (unit, e2e `pasteExecuted` check).
+- AC-005.5 paragraph boundaries: source whitespace collapses, spacer paragraphs are dropped, and inline wrappers around blocks keep blocks apart.
+- AC-005.6 NBSP normalized to spaces; AC-005.7 emoji, CJK, Cyrillic and right-to-left text preserved (unit and e2e).
+- AC-005.8 tables become `A | B` rows.
+- AC-005.9 undo: each paste is its own undo step, including right after typing (integration, e2e Ctrl+Z).
+- AC-005.10 read failure: the paste is handled before ProseMirror reads the clipboard; a failing read shows a message and leaves the document unchanged (integration).
+- Processing rules: data is read once from the user's paste event only, inserted at the selection, and the editor update triggers autosave (e2e waits for `Saved on this device`).
+
+Validation (2026-10-27):
+
+- Typecheck, lint and format checks passed.
+- 60 unit and integration tests passed.
+- Production build and manifest check passed (existing bundle-size advisory).
+- Playwright: 38 tests on installed Chrome and Edge. The three paste and import tests were repeated 5 times on each browser.
+
+Not verified:
+
+- Real clipboard captures from ChatGPT, Microsoft Word, Google Docs, Notion and VS Code. These sources are covered by hand-written HTML fixtures modelled on their clipboard formats, not by copying from the applications.
+- A real clipboard read failure in a browser; browsers supply paste data synchronously, so the failure path is tested with a throwing `getData` in jsdom.
+- Word multi-level list nesting (levels are flattened into one list) and the bundled Playwright Chromium project.
+- Manual LinkedIn paste behavior, which is covered by QA-005.

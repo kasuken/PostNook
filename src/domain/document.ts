@@ -15,20 +15,21 @@ export const emptyDocument = (): PostDocument => ({
   type: 'doc',
   content: [{ type: 'paragraph' }],
 });
+// Text nodes never hold newlines: each line break becomes a hard break, as in the editor.
+export const textNodes = (text: string, marks: Mark[] = []): PostNode[] =>
+  text
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .flatMap((line, index) => [
+      ...(index ? [{ type: 'hardBreak' as const }] : []),
+      ...(line ? [{ type: 'text' as const, text: line, ...(marks.length ? { marks } : {}) }] : []),
+    ]);
 export const textDocument = (text: string): PostDocument => ({
   type: 'doc',
   content: text
     .replace(/\r\n?/g, '\n')
     .split(/\n\n+/)
-    .map((p) => ({
-      type: 'paragraph',
-      content: p
-        .split('\n')
-        .flatMap((line, index) => [
-          ...(index ? [{ type: 'hardBreak' as const }] : []),
-          ...(line ? [{ type: 'text' as const, text: line }] : []),
-        ]),
-    })),
+    .map((p) => ({ type: 'paragraph', content: textNodes(p) })),
 });
 
 export function validateDocument(value: unknown): value is PostDocument {
