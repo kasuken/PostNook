@@ -150,14 +150,16 @@ test('marked hard breaks persist and Unicode output leaves original text editabl
 }) => {
   await createFirstPost(page);
   const editor = page.getByRole('textbox', { name: 'Post content' });
-  // A new draft focuses the editor once it is editable; filling before that can be lost.
-  await expect(editor).toBeFocused();
   await editor.fill('Hello');
-  await editor.press('ControlOrMeta+a');
-  await editor.press('ControlOrMeta+b');
-  await editor.press('ArrowRight');
-  await editor.press('Shift+Enter');
-  await editor.pressSequentially('World');
+  // Wait for ProseMirror to see each selection before the next key uses it (see `settled`).
+  await page.keyboard.press('ControlOrMeta+a');
+  await settled(editor, { text: 'Hello' });
+  await page.keyboard.press('ControlOrMeta+b');
+  await expect(editor.locator('strong')).toHaveText('Hello');
+  await page.keyboard.press('ArrowRight');
+  await settled(editor, { text: '', from: 6 });
+  await page.keyboard.press('Shift+Enter');
+  await page.keyboard.type('World');
   await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
   await page.getByLabel('Output mode').selectOption('unicode');
   await expect(page.getByRole('dialog')).toHaveAccessibleName('A note about Unicode styling');
