@@ -20,7 +20,7 @@ Domain and serializer code have no React, DOM, extension API, or LinkedIn depend
 
 ## Document and storage
 
-Tiptap JSON supports doc, paragraph, hardBreak, text, bulletList, orderedList, listItem, bold, and italic. StarterKit headings, blockquotes, code, code blocks, rules, strike, links, underline, and trailing-node behavior are disabled. Hard breaks can carry inherited marks. JSON is validated before storage and output; invalid stored records produce a load error rather than a blank replacement.
+Tiptap JSON supports doc, paragraph, hardBreak, text, bulletList, orderedList, listItem, bold, and italic. StarterKit headings, blockquotes, code, code blocks, rules, strike, links, underline, and trailing-node behavior are disabled. Hard breaks can carry inherited marks. JSON is validated before storage and output; invalid stored records produce a load error rather than a blank replacement. Editor options are created once per mounted draft so app re-renders do not re-apply editor state mid-input. Pasted content is inserted as an open slice so inline text merges into the current paragraph. Toolbar commands expose pressed, disabled, and shortcut state; a note under the editor explains how marks map to the selected output mode.
 
 Dexie database `postnook`, version 1, has `drafts` keyed by `id` and indexed by `updatedAt` and `createdAt`. Drafts use UUID v4, UTC timestamps, a 120-character title maximum, schemaVersion 1, and initial revision 1. Preferences are stored as `settings` in `chrome.storage.local`. The localhost harness uses localStorage instead and never accesses extension drafts.
 

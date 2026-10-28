@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
+import type { Editor } from '@tiptap/react';
 import AxeBuilder from '@axe-core/playwright';
 
 test.beforeEach(async ({ page }) => {
@@ -319,3 +320,121 @@ for (const width of [320, 400, 600]) {
     await expect(page.getByRole('button', { name: 'Copy Post', exact: true })).toBeVisible();
   });
 }
+
+// Automated keys can outrun selectionchange, and locator actions refocus the editor, which
+// restores ProseMirror's last known selection. Navigation therefore uses page.keyboard, and
+// tests wait until ProseMirror reports the selection before pressing a shortcut that uses it.
+async function settled(editor: Locator, expected: { text: string; from?: number }) {
+  await expect
+    .poll(() =>
+      editor.evaluate((el) => {
+        const { state } = (el as HTMLElement & { editor: Editor }).editor;
+        const { from, to } = state.selection;
+        return { text: state.doc.textBetween(from, to, ' '), from };
+      }),
+    )
+    .toMatchObject(expected);
+}
+
+test('keyboard editing: paragraphs, line breaks, marks, undo, redo, and replace', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await expect(page.getByRole('button', { name: 'Undo (Ctrl+Z)', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Clear formatting', exact: true })).toBeDisabled();
+  // Typing key by key does not wait for the post-create input lock to lift.
+  await expect(editor).toBeEditable();
+  await editor.click();
+  await editor.pressSequentially('First line');
+  await page.keyboard.press('Shift+Enter');
+  await editor.pressSequentially('same paragraph');
+  await page.keyboard.press('Enter');
+  await editor.pressSequentially('Second paragraph');
+  await expect(editor.locator('p')).toHaveCount(2);
+  await expect(editor.locator('p').first().locator('br')).toHaveCount(1);
+  await page.keyboard.press('Shift+Home');
+  await settled(editor, { text: 'Second paragraph' });
+  await page.keyboard.press('ControlOrMeta+i');
+  await expect(editor.locator('em')).toHaveText('Second paragraph');
+  await expect(page.getByRole('button', { name: 'Italic (Ctrl+I)', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.keyboard.press('ControlOrMeta+z');
+  await expect(editor.locator('em')).toHaveCount(0);
+  await page.keyboard.press('ControlOrMeta+Shift+z');
+  await expect(editor.locator('em')).toHaveText('Second paragraph');
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.press('Backspace');
+  await expect(editor).toHaveText('');
+  await editor.pressSequentially('Replaced');
+  await expect(editor).toHaveText('Replaced');
+  await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
+});
+
+test('formatting keeps the cursor and selection stable from keys and toolbar', async ({ page }) => {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await editor.fill('Write a clear sentence');
+  // Select "clear" by placing the cursor after it and extending left.
+  await page.keyboard.press('End');
+  for (let i = 0; i < 9; i++) await page.keyboard.press('ArrowLeft');
+  for (let i = 0; i < 5; i++) await page.keyboard.press('Shift+ArrowLeft');
+  await settled(editor, { text: 'clear', from: 9 });
+  const selection = () => page.evaluate(() => window.getSelection()?.toString());
+  await page.getByRole('button', { name: 'Bold (Ctrl+B)', exact: true }).click();
+  await expect(editor.locator('strong')).toHaveText('clear');
+  expect(await selection()).toBe('clear');
+  await expect(editor).toBeFocused();
+  // Keyboard-only: reach the toolbar from the editor and apply italic to the same selection.
+  const italic = page.getByRole('button', { name: 'Italic (Ctrl+I)', exact: true });
+  for (let i = 0; i < 10 && !(await italic.evaluate((el) => el === document.activeElement)); i++)
+    await page.keyboard.press('Shift+Tab');
+  await expect(italic).toBeFocused();
+  await page.keyboard.press('Space');
+  await expect(editor.locator('em')).toHaveText('clear');
+  await expect(editor).toBeFocused();
+  expect(await selection()).toBe('clear');
+  // A collapsed cursor keeps its position: typed text lands mid-sentence and bold.
+  await page.keyboard.press('End');
+  for (let i = 0; i < 13; i++) await page.keyboard.press('ArrowLeft');
+  await settled(editor, { text: '', from: 10 });
+  const bold = page.getByRole('button', { name: 'Bold (Ctrl+B)', exact: true });
+  await page.keyboard.press('ControlOrMeta+b');
+  await expect(bold).toHaveAttribute('aria-pressed', 'false');
+  await editor.pressSequentially('X');
+  await expect(editor).toHaveText('Write a cXlear sentence');
+  await expect(editor.locator('strong').filter({ hasText: 'X' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Clear formatting', exact: true }).click();
+  await expect(editor).toHaveText('Write a cXlear sentence');
+});
+
+test('pasting plain text over a selection stays inside the paragraph', async ({ page }) => {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await editor.fill('Keep old words here');
+  await page.keyboard.press('End');
+  for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowLeft');
+  for (let i = 0; i < 5; i++) await page.keyboard.press('Shift+ArrowLeft');
+  await settled(editor, { text: 'words' });
+  await editor.evaluate((el) => {
+    const data = new DataTransfer();
+    data.setData('text/plain', 'new');
+    el.dispatchEvent(
+      new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }),
+    );
+  });
+  await expect(editor).toHaveText('Keep old new here');
+  await expect(editor.locator('p')).toHaveCount(1);
+  await editor.evaluate((el) => {
+    const data = new DataTransfer();
+    data.setData('text/html', '<h2>Heading</h2><pre><code>code()</code></pre><img src="x">');
+    el.dispatchEvent(
+      new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }),
+    );
+  });
+  await expect(editor.locator('h2, pre, code, img')).toHaveCount(0);
+  await expect(editor).toContainText('Heading');
+  await expect(editor).toContainText('code()');
+});

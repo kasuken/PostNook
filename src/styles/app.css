@@ -255,6 +255,8 @@ legend {
 .icon-button[aria-pressed='true'] {
   background: var(--accent-soft);
   color: var(--accent);
+  /* A shape cue so the active state does not rely on color alone. */
+  box-shadow: inset 0 -2px 0 currentColor;
 }
 .draft-heading {
   display: flex;

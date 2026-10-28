@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+import type { EditorProps } from '@tiptap/pm/view';
 import { useEditor, useEditorState, EditorContent, type Editor } from '@tiptap/react';
 import { Slice } from '@tiptap/pm/model';
 import {
@@ -13,7 +14,7 @@ import {
 } from 'lucide-react';
 import { editorExtensions } from './extensions';
 import { IconButton } from '../../components/ui';
-import { validateDocument, type PostDocument } from '../../domain/document';
+import { validateDocument, type OutputMode, type PostDocument } from '../../domain/document';
 import { parseSupportedClipboardContent } from '../../services/paste';
 
 interface Props {
@@ -24,6 +25,22 @@ interface Props {
   onError: (message: string) => void;
   hidden?: boolean;
   editable?: boolean;
+  outputMode?: OutputMode;
+}
+const mod =
+  typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform) ? 'Cmd' : 'Ctrl';
+// Clear formatting is only meaningful when the selection carries marks or sits in a list.
+function hasFormatting(editor: Editor) {
+  if (editor.isActive('bulletList') || editor.isActive('orderedList')) return true;
+  const { state } = editor;
+  const { from, to, empty, $from } = state.selection;
+  if (empty) return (state.storedMarks ?? $from.marks()).length > 0;
+  let found = false;
+  state.doc.nodesBetween(from, to, (node) => {
+    if (node.marks.length) found = true;
+    return !found;
+  });
+  return found;
 }
 export function WritingEditor({
   initialContent,
@@ -33,15 +50,18 @@ export function WritingEditor({
   onError,
   hidden,
   editable = true,
+  outputMode = 'plain',
 }: Props) {
+  const noteId = useId();
   const callbacks = useRef({ onChange, onError });
   useEffect(() => {
     callbacks.current = { onChange, onError };
   }, [onChange, onError]);
-  const editor = useEditor({
+  // Options must keep their identity across renders: changed options make Tiptap reapply
+  // the editor state, which can drop a DOM selection the browser has not reported yet.
+  const [options] = useState(() => ({
     extensions: editorExtensions(),
     content: initialContent,
-    injectCSS: false,
     editorProps: {
       attributes: {
         role: 'textbox',
@@ -49,13 +69,14 @@ export function WritingEditor({
         'aria-multiline': 'true',
         spellcheck: 'true',
         dir: 'auto',
+        'aria-describedby': noteId,
       },
       handlePaste(view, event) {
         if (!event.clipboardData) return false;
         try {
           const doc = parseSupportedClipboardContent(event.clipboardData);
           const content = view.state.schema.nodeFromJSON(doc).content;
-          view.dispatch(view.state.tr.replaceSelection(new Slice(content, 0, 0)).scrollIntoView());
+          view.dispatch(view.state.tr.replaceSelection(Slice.maxOpen(content)).scrollIntoView());
         } catch (error) {
           callbacks.current.onError(
             error instanceof Error ? error.message : 'Paste failed. Your draft is unchanged.',
@@ -63,7 +84,11 @@ export function WritingEditor({
         }
         return true;
       },
-    },
+    } satisfies EditorProps,
+  }));
+  const editor = useEditor({
+    ...options,
+    injectCSS: false,
     onUpdate({ editor }) {
       const doc = editor.getJSON();
       if (validateDocument(doc)) callbacks.current.onChange(doc);
@@ -80,8 +105,13 @@ export function WritingEditor({
       italic: e?.isActive('italic'),
       bullet: e?.isActive('bulletList'),
       ordered: e?.isActive('orderedList'),
+      canBold: e?.can().toggleBold(),
+      canItalic: e?.can().toggleItalic(),
+      canBullet: e?.can().toggleBulletList(),
+      canOrdered: e?.can().toggleOrderedList(),
       undo: e?.can().undo(),
       redo: e?.can().redo(),
+      clear: e ? hasFormatting(e) : false,
     }),
   });
   useEffect(() => {
@@ -96,29 +126,37 @@ export function WritingEditor({
       <fieldset className="editor-toolbar" aria-label="Formatting controls" disabled={!editable}>
         <div className="toolbar-group">
           <IconButton
-            label="Bold (Ctrl+B)"
+            label={`Bold (${mod}+B)`}
+            aria-keyshortcuts="Control+B Meta+B"
             aria-pressed={active?.bold}
+            disabled={!active?.canBold}
             onClick={() => editor.chain().focus().toggleBold().run()}
           >
             <Bold size={17} />
           </IconButton>
           <IconButton
-            label="Italic (Ctrl+I)"
+            label={`Italic (${mod}+I)`}
+            aria-keyshortcuts="Control+I Meta+I"
             aria-pressed={active?.italic}
+            disabled={!active?.canItalic}
             onClick={() => editor.chain().focus().toggleItalic().run()}
           >
             <Italic size={17} />
           </IconButton>
           <IconButton
             label="Bullet list"
+            aria-keyshortcuts="Control+Shift+8 Meta+Shift+8"
             aria-pressed={active?.bullet}
+            disabled={!active?.canBullet}
             onClick={() => editor.chain().focus().toggleBulletList().run()}
           >
             <List size={18} />
           </IconButton>
           <IconButton
             label="Numbered list"
+            aria-keyshortcuts="Control+Shift+7 Meta+Shift+7"
             aria-pressed={active?.ordered}
+            disabled={!active?.canOrdered}
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
           >
             <ListOrdered size={18} />
@@ -126,14 +164,16 @@ export function WritingEditor({
         </div>
         <div className="toolbar-group">
           <IconButton
-            label="Undo (Ctrl+Z)"
+            label={`Undo (${mod}+Z)`}
+            aria-keyshortcuts="Control+Z Meta+Z"
             disabled={!active?.undo}
             onClick={() => editor.chain().focus().undo().run()}
           >
             <Undo2 size={17} />
           </IconButton>
           <IconButton
-            label="Redo (Ctrl+Shift+Z)"
+            label={`Redo (${mod}+Shift+Z)`}
+            aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z"
             disabled={!active?.redo}
             onClick={() => editor.chain().focus().redo().run()}
           >
@@ -141,6 +181,7 @@ export function WritingEditor({
           </IconButton>
           <IconButton
             label="Clear formatting"
+            disabled={!active?.clear}
             onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
           >
             <RemoveFormatting size={18} />
@@ -153,7 +194,11 @@ export function WritingEditor({
       <div className="writing-scroll">
         <EditorContent editor={editor} />
       </div>
-      <p className="editor-note">A little space to make your point.</p>
+      <p className="editor-note" id={noteId}>
+        {outputMode === 'plain'
+          ? 'Bold and italic help you shape this draft. Plain-text output copies your words without that styling.'
+          : 'Bold and italic are copied as Unicode characters where possible. Other text stays unstyled on LinkedIn.'}
+      </p>
     </section>
   );
 }

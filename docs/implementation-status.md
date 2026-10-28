@@ -30,3 +30,44 @@ Release CI, marketplace distribution, full compatibility/accessibility testing, 
 US-001 acceptance mapping: AC-001.1 to .3 and .6 are covered by the native probe (`docs/testing/chrome-native.json`, `msedge-native.json`) against an ordinary tab with only `sidePanel` and `storage` permissions and no host access, so the panel is independent of the active site, including LinkedIn. AC-001.4 and .5 are covered by the probe's reload and browser-restart restore. AC-001.7 and .8 are covered by `tests/integration/panel-startup.test.tsx` and `tests/unit/background.test.ts`.
 
 Not verified: Chrome 116 (the declared minimum) and previous-major releases; only the installed Chrome/Edge 156 builds were exercised. No LinkedIn page was driven.
+
+## E02 Writing Editor
+
+| Story                   | Issue                                                | Status      | Evidence                                                                                                   |
+| ----------------------- | ---------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------- |
+| US-002 create and edit  | [#12](https://github.com/kasuken/PostNook/issues/12) | Implemented | Minimal Tiptap schema, validated JSON, keyboard editing, stable selection, inline paste conversion         |
+| US-003 format text      | [#13](https://github.com/kasuken/PostNook/issues/13) | Implemented | Toolbar with pressed/disabled state, shortcuts exposed via `aria-keyshortcuts`, mode-aware formatting note |
+| E02 Writing Editor epic | [#3](https://github.com/kasuken/PostNook/issues/3)   | Implemented | Both children closed                                                                                       |
+
+US-002 acceptance mapping:
+
+- AC-002.1 new document: `Create first post` and `New draft` in `tests/e2e/writing.spec.ts`; the empty document state is in `tests/integration/editor.test.tsx`.
+- AC-002.2 to .8 (type, select, delete, replace, Enter, Shift+Enter, Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl/Cmd+B, Ctrl/Cmd+I): the e2e test `keyboard editing: paragraphs, line breaks, marks, undo, redo, and replace`, plus the existing hard-break and formatting e2e tests.
+- AC-002.9 stable cursor: the e2e test `formatting keeps the cursor and selection stable from keys and toolbar` and the integration test for toolbar selection.
+- AC-002.10 empty and long documents: integration tests (empty and 400-paragraph documents) and the existing 3,000-character stress e2e at 320, 400 and 600 px.
+- AC-002.11 no silent replacement: an editor update that fails validation reports an error and is not passed on for saving (integration test). Invalid stored records are rejected without replacement (`tests/integration/storage.test.ts`).
+- AC-002.12 unsupported paste: headings, code, tables, images and scripts are converted or removed (`tests/unit/import.test.ts`, the integration test, and the e2e tests for HTML and plain-text paste).
+
+The editor keeps its Tiptap options, extensions and editor props stable across renders, so autosave status updates no longer re-apply editor state while the user is typing. Paste now inserts an open slice, so a single pasted line replaces a selection inside the paragraph instead of splitting it.
+
+US-003 acceptance mapping:
+
+- AC-003.1 to .3 (bold, italic, bullet and numbered lists, undo, redo, clear formatting): `toggles lists and clears marks and lists back to plain paragraphs` (integration).
+- AC-003.4 active state: `aria-pressed`, shown visually with a fill and an underline, so it does not rely on color alone.
+- AC-003.5 disabled state: undo, redo and clear formatting are disabled (native `disabled`) when there is nothing to act on. Every control is disabled while input is locked.
+- AC-003.6 keyboard access: controls are native buttons in tab order, their shortcuts are exposed as `aria-keyshortcuts`, and the toolbar is reachable from the keyboard (e2e).
+- AC-003.7 selection kept: toolbar clicks keep the selection and focus (e2e and integration).
+- AC-003.8 explanation: the note under the editor follows the selected output mode and is linked to the editor as its accessible description (integration).
+
+Validation (2026-10-27):
+
+- Typecheck, lint and format checks passed.
+- 41 unit and integration tests passed.
+- Production build and manifest check passed.
+- Playwright: 34 tests on installed Chrome and Edge. The three new editor tests were repeated 8 times on each browser.
+
+Not verified:
+
+- The bundled Playwright Chromium project and macOS Cmd shortcuts. The labels switch to `Cmd` on Apple platforms, but this has not been tested on a Mac.
+- Screen-reader announcement of the formatting note.
+- Manual LinkedIn paste behavior, which is covered by QA-005.

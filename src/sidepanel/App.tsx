@@ -509,6 +509,7 @@ export function App() {
               onError={setError}
               hidden={preview}
               editable={!busy}
+              outputMode={settings.outputMode}
             />
             {preview && (
               <PostPreview
