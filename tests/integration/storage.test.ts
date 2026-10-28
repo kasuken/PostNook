@@ -22,7 +22,7 @@ describe('transactional drafts', () => {
     expect((await repo.getDraft(draft.id)).content).toEqual(textDocument('Two'));
     await repo.updateLastCopiedAt(draft.id, '2026-10-27T21:00:00.000Z');
     expect((await repo.getDraft(draft.id)).lastCopiedAt).toBe('2026-10-27T21:00:00.000Z');
-    expect((await repo.listDrafts())[0]?.title).toBe('Renamed');
+    expect((await repo.listDrafts()).drafts[0]?.title).toBe('Renamed');
     await repo.deleteDraft(draft.id, 2);
     await expect(repo.getDraft(draft.id)).rejects.toMatchObject({ code: 'missing' });
   });
@@ -64,13 +64,59 @@ describe('transactional drafts', () => {
     });
     expect(await repo.db.drafts.get(d.id)).toEqual({ ...old, schemaVersion: 1 });
   });
-  it('rejects corrupt and future records without deleting or replacing them', async () => {
+  it('reports corrupt and future records without deleting or replacing them', async () => {
     const repo = repository();
+    const readable = await repo.createDraft('Readable', textDocument('Still here'));
     const d = await repo.createDraft('Safe', textDocument('Keep'));
     const future: Draft = { ...d, schemaVersion: 99 };
     await repo.db.drafts.put(future);
-    await expect(repo.listDrafts()).rejects.toMatchObject({ code: 'invalid' });
+    await repo.db.drafts.put({ id: crypto.randomUUID() } as Draft);
+    expect(await repo.listDrafts()).toEqual({ drafts: [readable], unreadable: 2 });
+    await expect(repo.getDraft(d.id)).rejects.toMatchObject({ code: 'invalid' });
     expect(await repo.db.drafts.get(d.id)).toEqual(future);
+    expect(await repo.db.drafts.count()).toBe(3);
     expect(() => migrateDraftV1(future)).toThrow();
+  });
+  it('lists drafts newest first by last modification', async () => {
+    const repo = repository();
+    const make = async (title: string, updatedAt: string) => {
+      const d = await repo.createDraft(title, textDocument(title));
+      await repo.db.drafts.put({ ...d, updatedAt });
+    };
+    await make('Middle', '2026-10-02T09:00:00.000Z');
+    await make('Newest', '2026-10-03T09:00:00.000Z');
+    await make('Oldest', '2026-10-01T09:00:00.000Z');
+    const { drafts } = await repo.listDrafts();
+    expect(drafts.map((d) => d.title)).toEqual(['Newest', 'Middle', 'Oldest']);
+    const oldest = drafts[2]!;
+    await repo.updateDraft(oldest.id, oldest.revision, oldest.content, 'Edited');
+    expect((await repo.listDrafts()).drafts[0]?.title).toBe('Edited');
+  });
+  it('keeps version 1 drafts through a Dexie upgrade that runs the migration', async () => {
+    const name = 'test-' + crypto.randomUUID();
+    const v1 = new PostNookDatabase(name);
+    const repo = new IndexedDraftRepository(v1);
+    const d = await repo.createDraft('Before upgrade', textDocument('Kept across versions'));
+    await v1.drafts.put({ ...d, schemaVersion: 0 });
+    v1.close();
+    // Test-only v2: production storage stays at version 1.
+    class UpgradedDatabase extends PostNookDatabase {
+      constructor() {
+        super(name);
+        this.version(2)
+          .stores({ drafts: 'id, updatedAt, createdAt' })
+          .upgrade((tx) =>
+            tx
+              .table('drafts')
+              .toCollection()
+              .modify((record: Draft, ref: { value: Draft }) => {
+                ref.value = migrateDraftV1(record);
+              }),
+          );
+      }
+    }
+    const v2 = new UpgradedDatabase();
+    databases.push(v2);
+    expect(await new IndexedDraftRepository(v2).getDraft(d.id)).toEqual(d);
   });
 });

@@ -67,11 +67,32 @@ describe('honest autosave', () => {
   });
   it('retains unsaved content after failure and changes status only after explicit retry succeeds', async () => {
     const { service, updateDraft } = setup();
-    updateDraft.mockRejectedValueOnce(new DraftError('unavailable', 'Storage unavailable'));
+    updateDraft.mockRejectedValueOnce(new DraftError('quota', 'Device storage is full'));
     service.edit(textDocument('Important'));
     expect(await service.flush()).toBe(false);
     expect(service.snapshot().status).toBe('failed');
     expect(service.draft.content).toEqual(textDocument('Important'));
+    expect(await service.flush()).toBe(true);
+    expect(service.snapshot().status).toBe('saved');
+    service.dispose();
+  });
+  it('reports unavailable storage and keeps it visible while typing continues', async () => {
+    vi.useFakeTimers();
+    const { service, updateDraft } = setup();
+    updateDraft.mockRejectedValueOnce(
+      new DraftError('unavailable', 'Local storage is unavailable'),
+    );
+    service.edit(textDocument('One'));
+    await vi.advanceTimersByTimeAsync(300);
+    expect(service.snapshot()).toMatchObject({
+      status: 'unavailable',
+      message: 'Local storage is unavailable',
+    });
+    service.edit(textDocument('Two'));
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(updateDraft).toHaveBeenCalledTimes(1);
+    expect(service.snapshot().status).toBe('unavailable');
+    expect(service.draft.content).toEqual(textDocument('Two'));
     expect(await service.flush()).toBe(true);
     expect(service.snapshot().status).toBe('saved');
     service.dispose();

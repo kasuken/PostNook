@@ -19,10 +19,15 @@ export class DraftError extends Error {
     this.name = 'DraftError';
   }
 }
+export interface DraftListing {
+  drafts: Draft[];
+  /** Stored records that failed validation; they stay in the database untouched. */
+  unreadable: number;
+}
 export interface DraftRepository {
   createDraft(title: string, content: PostDocument): Promise<Draft>;
   getDraft(id: string): Promise<Draft>;
-  listDrafts(): Promise<Draft[]>;
+  listDrafts(): Promise<DraftListing>;
   updateDraft(
     id: string,
     expectedRevision: number,

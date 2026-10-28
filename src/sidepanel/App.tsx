@@ -51,6 +51,7 @@ export function App() {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const settingsRef = useRef(settings);
   const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [unreadable, setUnreadable] = useState(0);
   const [save, setSave] = useState<SaveSnapshot | null>(null);
   const service = useRef<AutosaveService | null>(null);
   const unsubscribe = useRef<(() => void) | null>(null);
@@ -98,6 +99,12 @@ export function App() {
     [updateSettings],
   );
 
+  const refresh = useCallback(async () => {
+    const listing = await repository.listDrafts();
+    setDrafts(listing.drafts);
+    setUnreadable(listing.unreadable);
+    return listing.drafts;
+  }, []);
   const load = useCallback(
     async (ignoreActive = false) => {
       setBooting(true);
@@ -110,8 +117,7 @@ export function App() {
         }
         settingsRef.current = preferences;
         setSettings(preferences);
-        const available = await repository.listDrafts();
-        setDrafts(available);
+        const available = await refresh();
         // Never replace a missing requested draft with a blank document.
         const active = preferences.activeDraftId
           ? await repository.getDraft(preferences.activeDraftId)
@@ -127,7 +133,7 @@ export function App() {
         setBooting(false);
       }
     },
-    [attach],
+    [attach, refresh],
   );
   useEffect(() => {
     void load();
@@ -156,10 +162,12 @@ export function App() {
       }
     };
     window.addEventListener('blur', flush);
+    window.addEventListener('pagehide', flush);
     document.addEventListener('visibilitychange', flush);
     window.addEventListener('beforeunload', warn);
     return () => {
       window.removeEventListener('blur', flush);
+      window.removeEventListener('pagehide', flush);
       document.removeEventListener('visibilitychange', flush);
       window.removeEventListener('beforeunload', warn);
     };
@@ -183,6 +191,8 @@ export function App() {
     try {
       await fn();
     } catch (e) {
+      // Close any dialog so the message is not hidden behind it.
+      setDialog(null);
       setError(
         e instanceof Error
           ? e.message
@@ -193,19 +203,26 @@ export function App() {
       setBusy(false);
     }
   }
+  // Saves the open draft before it is replaced; a failed save stops the action with a reason.
+  async function saveCurrent() {
+    if (service.current && !(await service.current.flush()))
+      throw new Error(
+        'Your current draft has unsaved changes that could not be saved, so it stays open. Retry the save or keep a separate copy first.',
+      );
+  }
   async function create() {
     await action(async () => {
-      if (service.current && !(await service.current.flush())) return;
+      await saveCurrent();
       const created = await repository.createDraft('Untitled Post', emptyDocument());
       focusNext.current = true;
       attach(created);
-      setDrafts(await repository.listDrafts());
+      await refresh();
       setDialog(null);
     });
   }
   async function select(draft: Draft) {
     await action(async () => {
-      if (service.current && !(await service.current.flush())) return;
+      await saveCurrent();
       const loaded = await repository.getDraft(draft.id);
       attach(loaded);
       setDialog(null);
@@ -213,7 +230,7 @@ export function App() {
   }
   async function openDrafts() {
     await action(async () => {
-      setDrafts(await repository.listDrafts());
+      await refresh();
       setDialog('drafts');
     });
   }
@@ -288,16 +305,16 @@ export function App() {
           )
         : await repository.getDraft(current.id);
       attach(recovered);
-      setDrafts(await repository.listDrafts());
+      await refresh();
       setDialog(null);
     });
   }
   async function remove() {
     await action(async () => {
-      if (!service.current || !(await service.current.flush())) return;
+      if (!service.current) return;
+      await saveCurrent();
       await repository.deleteDraft(service.current.draft.id, service.current.draft.revision);
-      const remaining = await repository.listDrafts();
-      setDrafts(remaining);
+      const remaining = await refresh();
       unsubscribe.current?.();
       service.current.dispose();
       service.current = null;
@@ -358,6 +375,13 @@ export function App() {
           }
         >
           {error}
+        </Notice>
+      )}
+      {unreadable > 0 && (
+        <Notice>
+          {unreadable === 1
+            ? '1 stored draft could not be read. It was left untouched on this device.'
+            : `${unreadable} stored drafts could not be read. They were left untouched on this device.`}
         </Notice>
       )}
       {booting ? (
@@ -658,7 +682,10 @@ export function App() {
       )}
       {dialog === 'delete' && (
         <Modal title="Delete this draft?" onClose={() => setDialog(null)}>
-          <p>“{save?.draft.title}” will be removed from this device. This cannot be undone.</p>
+          <p>
+            “{save?.draft.title || 'Untitled Post'}” will be removed from this device. This cannot
+            be undone.
+          </p>
           <div className="modal-actions">
             <Button onClick={() => setDialog(null)}>Keep draft</Button>
             <Button

@@ -114,6 +114,7 @@ const saveLabels: Record<SaveStatus, string> = {
   saving: 'Saving…',
   dirty: 'Unsaved changes',
   failed: 'Save failed',
+  unavailable: 'Storage unavailable',
   conflict: 'Newer version found',
 };
 export function SaveIndicator({ status }: { status: SaveStatus }) {

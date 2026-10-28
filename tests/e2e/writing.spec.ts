@@ -184,6 +184,7 @@ test('failed writes preserve unsaved text and prevent a draft switch until retry
   await editor.fill('Keep my unsaved words');
   await expect(page.getByRole('alert')).toContainText('storage is full');
   await page.getByRole('button', { name: 'New draft', exact: true }).click();
+  await expect(page.getByText('could not be saved, so it stays open')).toBeVisible();
   await expect(editor).toHaveText('Keep my unsaved words');
   await expect(page.getByRole('status').filter({ hasText: 'Save failed' })).toBeVisible();
   await page.evaluate(() => (window as unknown as { restorePut: () => void }).restorePut());
@@ -267,6 +268,8 @@ for (const width of [320, 400, 600]) {
     const editor = page.getByRole('textbox', { name: 'Post content' });
     const sample = 'مرحبا Hello 日本語 👩‍💻 https://example.com/' + 'a'.repeat(180);
     const fixture = sample.padEnd(3000, '文');
+    // A new draft focuses the editor once it is editable; filling before that can append.
+    await expect(editor).toBeFocused();
     await page.getByRole('textbox', { name: 'Draft title' }).fill('Long title '.repeat(10));
     await editor.fill(fixture);
     await expect(
@@ -284,6 +287,8 @@ for (const width of [320, 400, 600]) {
       true,
     );
     await page.getByRole('button', { name: 'Write', exact: true }).click();
+    // Write focuses the editor on the next frame; a fill before that can lose its selection.
+    await expect(editor).toBeFocused();
     await editor.fill(fixture + 'x');
     await page.getByRole('button', { name: 'Copy Post', exact: true }).click();
     await expect(page.getByRole('dialog')).toHaveAccessibleName('Your post is over the estimate');
@@ -491,22 +496,28 @@ test('pasting plain text over a selection stays inside the paragraph', async ({ 
 // The counter follows the browser locale, so any thousands separator is accepted.
 const counted = (n: string) =>
   new RegExp(`^${n.replace(/\B(?=(\d{3})+$)/g, '\\D?')} of 3\\D?000 estimated characters$`);
-type StoredDraft = { content: unknown; revision: number; lastCopiedAt: string | null };
-const storedDraft = (page: import('@playwright/test').Page) =>
+type StoredDraft = {
+  title: string;
+  content: unknown;
+  revision: number;
+  lastCopiedAt: string | null;
+};
+const storedDrafts = (page: import('@playwright/test').Page) =>
   page.evaluate(
     () =>
-      new Promise<StoredDraft>((resolve, reject) => {
+      new Promise<StoredDraft[]>((resolve, reject) => {
         const open = indexedDB.open('postnook');
         open.onerror = () => reject(open.error);
         open.onsuccess = () => {
           const all = open.result.transaction('drafts').objectStore('drafts').getAll();
           all.onsuccess = () => {
             open.result.close();
-            resolve(all.result[0] as StoredDraft);
+            resolve(all.result as StoredDraft[]);
           };
         };
       }),
   );
+const storedDraft = async (page: import('@playwright/test').Page) => (await storedDrafts(page))[0]!;
 
 test('the counter follows the generated output, not the editor content', async ({ page }) => {
   await page.getByRole('button', { name: 'Create first post' }).click();
@@ -618,4 +629,142 @@ test('copy records the time only after success and leaves the draft untouched', 
   );
   await expect(editor.locator('ol li')).toHaveCount(3);
   await expect(editor).toHaveText('First lineSecond line');
+});
+
+test('focus loss and page hide save pending edits before the debounce fires', async ({ page }) => {
+  await page.clock.install();
+  await page.reload();
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await expect(editor).toBeVisible();
+  // Freeze time so neither the 300 ms debounce nor the 1,500 ms maximum wait can fire.
+  await page.clock.pauseAt(Date.now() + 60_000);
+  const status = page.getByRole('status').filter({ hasText: /Saved on this device|Unsaved/ });
+  for (const [text, event] of [
+    ['Saved on blur', 'blur'],
+    ['Saved on hide', 'visibilitychange'],
+    ['Saved on close', 'pagehide'],
+  ] as const) {
+    await editor.fill(text);
+    await expect(status).toHaveText('Unsaved changes');
+    expect(JSON.stringify((await storedDraft(page)).content)).not.toContain(text);
+    await page.evaluate((name) => {
+      const target = name === 'visibilitychange' ? document : window;
+      target.dispatchEvent(new Event(name));
+    }, event);
+    await expect(status).toHaveText('Saved on this device');
+    expect(JSON.stringify((await storedDraft(page)).content)).toContain(text);
+  }
+});
+
+test('drafts list newest first, show the active draft, and reopen the last active one', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const title = page.getByRole('textbox', { name: 'Draft title' });
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  const saved = page.getByRole('status').filter({ hasText: 'Saved on this device' });
+  await expect(editor).toBeFocused();
+  await title.fill('Older draft');
+  await editor.fill('Written first');
+  await expect(saved).toBeVisible();
+  await page.getByRole('button', { name: 'New draft', exact: true }).click();
+  await expect(editor).toBeFocused();
+  await expect(title).toHaveValue('Untitled Post');
+  await title.fill('Newer draft');
+  await editor.fill('Written second');
+  await expect
+    .poll(async () => (await storedDrafts(page)).map((d) => d.title))
+    .toContain('Newer draft');
+  await expect(saved).toBeVisible();
+  await page.getByRole('button', { name: 'Open drafts', exact: true }).click();
+  const rows = page.locator('.draft-row');
+  await expect(rows).toHaveText([/Newer draft/, /Older draft/]);
+  await expect(rows.first()).toHaveAttribute('aria-current', 'true');
+  await rows.filter({ hasText: 'Older draft' }).click();
+  await expect(editor).toHaveText('Written first');
+  // The older draft is not the newest, so only the stored active id can bring it back.
+  await page.reload();
+  await expect(title).toHaveValue('Older draft');
+  await expect(editor).toHaveText('Written first');
+  await page.getByRole('button', { name: 'Open drafts', exact: true }).click();
+  await expect(rows.filter({ hasText: 'Older draft' })).toHaveAttribute('aria-current', 'true');
+  await expect(rows.filter({ hasText: 'Newer draft' })).not.toHaveAttribute('aria-current');
+});
+
+test('deleting the last draft shows the empty state', async ({ page }) => {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  await expect(page.getByRole('textbox', { name: 'Post content' })).toBeFocused();
+  await page.getByRole('textbox', { name: 'Draft title' }).fill('');
+  await page.getByRole('button', { name: 'Delete current draft' }).click();
+  await expect(page.getByRole('dialog')).toContainText('“Untitled Post” will be removed');
+  await page.getByRole('button', { name: 'Delete draft', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Give it a little space.' })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'Post content' })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Create first post' })).toBeVisible();
+});
+
+test('an unreadable stored draft is reported and left untouched while others stay usable', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const title = page.getByRole('textbox', { name: 'Draft title' });
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  const saved = page.getByRole('status').filter({ hasText: 'Saved on this device' });
+  await expect(editor).toBeFocused();
+  await title.fill('Healthy draft');
+  await editor.fill('Still readable');
+  await expect(saved).toBeVisible();
+  await page.getByRole('button', { name: 'New draft', exact: true }).click();
+  await expect(editor).toBeFocused();
+  await title.fill('Damaged draft');
+  // The new draft already shows Saved, so wait for the renamed record itself.
+  await expect
+    .poll(async () => (await storedDrafts(page)).map((d) => d.title))
+    .toContain('Damaged draft');
+  await expect(saved).toBeVisible();
+  // Mark the active draft as written by a future schema.
+  const damagedId = await page.evaluate(
+    () =>
+      new Promise<string>((resolve, reject) => {
+        const id = JSON.parse(localStorage.getItem('postnook-settings')!).activeDraftId as string;
+        const open = indexedDB.open('postnook');
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const store = open.result.transaction('drafts', 'readwrite').objectStore('drafts');
+          const get = store.get(id);
+          get.onsuccess = () => {
+            store.put({ ...get.result, schemaVersion: 99 }).onsuccess = () => {
+              open.result.close();
+              resolve(id);
+            };
+          };
+        };
+      }),
+  );
+  await page.reload();
+  await expect(page.getByText('could not be read safely')).toBeVisible();
+  await expect(editor).toHaveCount(0);
+  await page.getByRole('button', { name: 'Open remaining drafts' }).click();
+  await expect(page.getByText('1 stored draft could not be read')).toBeVisible();
+  await expect(title).toHaveValue('Healthy draft');
+  await expect(editor).toHaveText('Still readable');
+  await page.getByRole('button', { name: 'Open drafts', exact: true }).click();
+  await expect(page.locator('.draft-row')).toHaveCount(1);
+  const kept = await page.evaluate(
+    (id) =>
+      new Promise<unknown>((resolve) => {
+        const open = indexedDB.open('postnook');
+        open.onsuccess = () => {
+          const get = open.result.transaction('drafts').objectStore('drafts').get(id);
+          get.onsuccess = () => {
+            open.result.close();
+            resolve(get.result);
+          };
+        };
+      }),
+    damagedId,
+  );
+  expect(kept).toMatchObject({ title: 'Damaged draft', schemaVersion: 99 });
 });

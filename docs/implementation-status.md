@@ -170,3 +170,49 @@ Not verified:
 - How lists, indentation and Unicode styling look after a manual paste into LinkedIn (QA-005).
 - Chrome 116, the bundled Playwright Chromium project, and macOS.
 - Windows reads the clipboard back with CRLF line endings; the e2e test normalizes them. How LinkedIn handles them is part of QA-005.
+
+## E05 Draft Management
+
+| Story                     | Issue                                                | Status      | Evidence                                                                                                      |
+| ------------------------- | ---------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
+| US-009 automatic saving   | [#19](https://github.com/kasuken/PostNook/issues/19) | Implemented | Debounced and periodic writes, flush on blur, hide and page close, Storage unavailable state, revision checks |
+| US-010 multiple drafts    | [#20](https://github.com/kasuken/PostNook/issues/20) | Implemented | Create, rename, switch, confirmed delete, newest-first list, last active restored, unreadable drafts reported |
+| E05 Draft Management epic | [#6](https://github.com/kasuken/PostNook/issues/6)   | Implemented | Both children closed                                                                                          |
+
+US-009 acceptance mapping:
+
+- AC-009.1 unique id: `crypto.randomUUID()` v4, validated on every read and write (`tests/integration/storage.test.ts`).
+- AC-009.2 and .9: each save reads, validates, checks the revision and writes the whole record in one Dexie read/write transaction; a failure after the put rolls back (integration).
+- AC-009.3 and .4: 300 ms debounce and 1,500 ms maximum wait; 15 edits over 1.5 s produce one write (`tests/unit/autosave.test.ts`).
+- AC-009.5 save status: Saved, Saving, Unsaved changes, Save failed, Storage unavailable and Newer version found, in a polite live region. Storage unavailable is new in this epic and, like the other error states, stays visible while typing continues (unit).
+- AC-009.6: content and title survive a reload (e2e); a real browser restart was verified by the TF-004 native probe.
+- AC-009.7: errors keep the text, show a persistent notice with Retry save and Keep separate copy, and Saved appears only after a retry commits (unit and e2e with failing `IDBObjectStore.put`).
+- AC-009.8: window `blur`, `visibilitychange` and `pagehide` flush at once. The e2e test freezes the page clock so the debounce cannot fire, dispatches each event and reads the edit back from IndexedDB.
+- AC-009.10: a stale second window gets Newer version found and keeps its text; it can keep a separate copy or reload after confirmation (e2e with two pages).
+- AC-009.11: a test-only Dexie version 2 upgrade runs `migrateDraftV1` and the version 1 record survives unchanged (integration). Production storage stays at version 1.
+- Error handling: creating, switching or deleting while the current draft cannot be saved now stops with a visible reason instead of silently doing nothing behind the dialog (e2e).
+
+US-010 acceptance mapping:
+
+- AC-010.1 to .3: New draft, the Draft title field and the drafts dialog (e2e). New drafts are named Untitled Post; the title is never set automatically.
+- AC-010.4 and .5: Delete current draft opens a confirmation; Keep draft leaves it in place (e2e).
+- AC-010.6: the list is sorted by `updatedAt`, newest first, using explicit timestamps (integration) and in the dialog (e2e).
+- AC-010.7: switching to the older draft and reloading reopens that draft, so the stored active id is used rather than the newest draft (e2e).
+- AC-010.8: switching and creating flush the current draft first (e2e).
+- AC-010.9: deleting the last draft shows the empty state, also after a reload (e2e). The dialog list has its own empty message.
+- AC-010.10: a missing or unreadable active draft shows an error instead of a blank document. A record from a future schema no longer blocks the other drafts: Open remaining drafts opens them, a notice says one draft could not be read, and the record stays untouched in IndexedDB (integration and e2e).
+- The selector shows title (Untitled Post when blank), last modified time and the active draft (`aria-current` plus a check mark).
+
+Validation (2026-10-27):
+
+- Typecheck, lint and format checks passed.
+- 68 unit and integration tests passed.
+- Production build and manifest check passed (existing bundle-size advisory).
+- Playwright: 52 tests on installed Chrome and Edge, two clean full runs. The new and changed draft tests and the stress test were repeated 8 times on each browser.
+- The E04 stress-test flake is explained and fixed. The app focuses the editor late (once a new draft becomes editable, and one frame after Write), and a `fill` that lands before that focus loses its selection and appends. The stress test and the new tests now wait for the focus first. A few older tests type right after creating a draft and could still hit this; a person cannot type in that window.
+
+Not verified:
+
+- Flush when the real side panel is closed. The `pagehide` path is tested in a tab; whether Chrome and Edge finish the IndexedDB write as the panel closes was not measured.
+- A browser restart after this epic's changes; restart persistence relies on the TF-004 probe.
+- Two side panels in two real browser windows; the conflict test uses two tabs on the dev server.

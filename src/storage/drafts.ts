@@ -101,10 +101,21 @@ export class IndexedDraftRepository implements DraftRepository {
   }
   async listDrafts() {
     return this.run(async () => {
-      const drafts = await this.db.drafts.orderBy('updatedAt').reverse().toArray();
-      // A bad record is surfaced, never silently skipped or replaced.
-      drafts.forEach(validateDraft);
-      return drafts;
+      // Read every row, not the updatedAt index, so records missing that field are counted too.
+      const records: unknown[] = await this.db.drafts.toArray();
+      const drafts: Draft[] = [];
+      let unreadable = 0;
+      for (const record of records) {
+        try {
+          validateDraft(record);
+          drafts.push(record);
+        } catch {
+          // A bad record is reported and left in place, never deleted or replaced.
+          unreadable++;
+        }
+      }
+      drafts.sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
+      return { drafts, unreadable };
     });
   }
   async updateDraft(id: string, expectedRevision: number, content: PostDocument, title: string) {

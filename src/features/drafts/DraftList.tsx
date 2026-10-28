@@ -16,6 +16,7 @@ export function DraftList({
     <>
       <p className="muted">Little beginnings. Future conversations.</p>
       <div className="draft-list">
+        {drafts.length === 0 && <p className="muted">No drafts yet. Start one below.</p>}
         {drafts.map((d) => (
           <button
             type="button"

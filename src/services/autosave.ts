@@ -1,6 +1,9 @@
 import { DraftError, type Draft, type DraftRepository } from '../domain/contracts';
 import type { PostDocument } from '../domain/document';
-export type SaveStatus = 'saved' | 'saving' | 'dirty' | 'failed' | 'conflict';
+export type SaveStatus = 'saved' | 'saving' | 'dirty' | 'failed' | 'unavailable' | 'conflict';
+// Error states wait for an explicit retry so a keystroke never hides them.
+const blocked = (status: SaveStatus) =>
+  status === 'conflict' || status === 'failed' || status === 'unavailable';
 export interface SaveSnapshot {
   draft: Draft;
   status: SaveStatus;
@@ -38,7 +41,7 @@ export class AutosaveService {
   edit(content: PostDocument, title = this.draft.title) {
     this.draft = { ...this.draft, content, title };
     this.generation++;
-    if (this.status !== 'conflict' && this.status !== 'failed') {
+    if (!blocked(this.status)) {
       this.status = 'dirty';
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
@@ -78,8 +81,9 @@ export class AutosaveService {
         this.draft = { ...saved, content: this.draft.content, title: this.draft.title };
         this.committed = version;
       } catch (error) {
+        const code = error instanceof DraftError ? error.code : undefined;
         this.status =
-          error instanceof DraftError && error.code === 'conflict' ? 'conflict' : 'failed';
+          code === 'conflict' ? 'conflict' : code === 'unavailable' ? 'unavailable' : 'failed';
         this.message =
           error instanceof Error
             ? error.message
