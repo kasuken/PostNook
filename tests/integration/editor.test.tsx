@@ -176,5 +176,37 @@ describe('writing editor', () => {
     const doc = onChange.mock.lastCall![0] as PostDocument;
     expect(doc).toEqual(textDocument('Before Bigafter'));
   });
+
+  it('pastes a list into an empty document and next to existing text', () => {
+    const html = '<ul><li>a</li><li>b</li></ul>';
+    const paste = (editor: Editor) =>
+      act(() => {
+        editor.view.dom.dispatchEvent(
+          Object.assign(new Event('paste', { bubbles: true, cancelable: true }), {
+            clipboardData: { getData: (type: string) => (type === 'text/html' ? html : 'a b') },
+          }),
+        );
+      });
+    const empty = setup();
+    paste(empty.get());
+    const list = {
+      type: 'bulletList',
+      content: ['a', 'b'].map((text) => ({
+        type: 'listItem',
+        content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+      })),
+    };
+    expect(empty.get().getJSON()).toEqual({ type: 'doc', content: [list] });
+    empty.unmount();
+    const mid = setup(textDocument('Before after'));
+    act(() => {
+      mid.get().commands.setTextSelection(8);
+    });
+    paste(mid.get());
+    expect(mid.get().getJSON()).toEqual({
+      type: 'doc',
+      content: [...textDocument('Before ').content, list, ...textDocument('after').content],
+    });
+  });
 });
 const paragraph = (): PostNode => ({ type: 'paragraph', content: [{ type: 'text', text: 'x' }] });

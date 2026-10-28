@@ -76,7 +76,11 @@ export function WritingEditor({
         try {
           const doc = parseSupportedClipboardContent(event.clipboardData);
           const content = view.state.schema.nodeFromJSON(doc).content;
-          view.dispatch(view.state.tr.replaceSelection(Slice.maxOpen(content)).scrollIntoView());
+          // A single pasted paragraph joins the current line; lists and multiple paragraphs
+          // stay whole blocks instead of merging their first item into the surrounding text.
+          const inline = content.childCount === 1 && content.firstChild?.type.name === 'paragraph';
+          const slice = inline ? Slice.maxOpen(content) : new Slice(content, 0, 0);
+          view.dispatch(view.state.tr.replaceSelection(slice).scrollIntoView());
         } catch (error) {
           callbacks.current.onError(
             error instanceof Error ? error.message : 'Paste failed. Your draft is unchanged.',
