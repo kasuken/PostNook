@@ -26,11 +26,26 @@ describe('side panel startup', () => {
     expect(await screen.findByRole('button', { name: /create first post/i })).toBeEnabled();
   });
 
-  it('shows a recoverable error when browser storage cannot be read', async () => {
+  it('keeps the drafts usable when preferences cannot be read, without overwriting them', async () => {
     stubChrome(() => Promise.reject(new Error('storage unavailable')));
+    const set = chrome.storage.local.set;
     render(<App />);
-    expect(await screen.findByText('storage unavailable')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /retry loading/i })).toBeEnabled();
+    expect(await screen.findByText(/storage unavailable/)).toHaveTextContent(
+      'Default preferences are used for now',
+    );
+    expect(screen.getByRole('button', { name: /retry preferences/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /create first post/i })).toBeEnabled();
+    expect(set).not.toHaveBeenCalled();
+  });
+
+  it('opens drafts with default preferences when they come from a newer version', async () => {
+    stubChrome((key) =>
+      Promise.resolve(key === 'settings' ? { settings: { settingsSchemaVersion: 2 } } : {}),
+    );
+    render(<App />);
+    expect(await screen.findByText(/saved by a newer PostNook version/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create first post/i })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: /retry loading/i })).toBeNull();
   });
 
   it('offers retry when the background worker recorded a setup failure', async () => {

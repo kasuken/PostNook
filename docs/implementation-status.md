@@ -252,3 +252,49 @@ Not verified:
 - How LinkedIn itself renders the post; this is covered by QA-005.
 - The preview inside the real side panel; tests use the dev server in a tab.
 - Browsers other than the installed Chrome and Edge 156.
+
+## E07 Settings and Accessibility
+
+| Story                              | Issue                                                | Status      | Evidence                                                                                                    |
+| ---------------------------------- | ---------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------- |
+| US-012 application theme           | [#22](https://github.com/kasuken/PostNook/issues/22) | Implemented | System default, Light and Dark, stored choice wins after reload, mid-sentence theme changes keep the cursor |
+| US-013 output behavior             | [#23](https://github.com/kasuken/PostNook/issues/23) | Implemented | Plain by default, one-time Unicode warning, declining keeps plain, choice persists, draft JSON unchanged    |
+| UX-001 side-panel shell and states | [#30](https://github.com/kasuken/PostNook/issues/30) | Implemented | Layout from 320 px, PRD empty states, error presentations, unreadable preferences no longer block drafts    |
+| E07 Settings and Accessibility     | [#8](https://github.com/kasuken/PostNook/issues/8)   | Implemented | All three children closed                                                                                   |
+
+US-012 acceptance mapping:
+
+- AC-012.1 to .3: Light and Dark themes, with System as the default (`parseSettings` unit test). With System selected, the theme follows `prefers-color-scheme` live (e2e with emulated light and dark).
+- AC-012.4: a Light choice survives a reload while the system is dark (e2e).
+- AC-012.5: a system theme change mid-sentence keeps focus, cursor and typing; changing the theme in Settings leaves the text in place and it still saves (e2e).
+- AC-012.6: 20 measured contrast pairs pass (`node scripts/measure-contrast.mjs`, [contrast](design/contrast.md)). Axe (WCAG 2.2 AA tags) is clean in both themes at 320, 400 and 600 px and in preview. Theme buttons work from the keyboard (component test).
+
+US-013 acceptance mapping:
+
+- AC-013.1 and .2: plain is the default; Unicode needs an explicit choice.
+- AC-013.3: the Copy as control and the footer note show the active mode.
+- AC-013.4: the warning appears before first use. Keep plain text leaves the mode on plain, and after acknowledging, the warning does not return (e2e).
+- AC-013.5: the mode survives a reload (e2e).
+- AC-013.6: the counter (existing counter e2e) and the preview (E06 e2e) update at once.
+- AC-013.7: the stored draft JSON is unchanged after switching modes (e2e).
+
+UX-001 acceptance mapping:
+
+- Layout: header, toolbar, editor and footer from 320 px without page-wide horizontal scrolling (layout and stress e2e at 320, 400 and 600 px; 200% root font size).
+- Empty states: Create first post, the "Start writing your post..." placeholder, and Copy Post disabled with no content.
+- Accessibility: labeled controls, visible focus, keyboard dialogs, polite save, copy and limit announcements, warnings in words and not only color, and reduced motion (transition duration 0s under `prefers-reduced-motion`).
+- Error presentations: storage unavailable, quota (`DraftError('quota')`), load and save failure, Markdown parsing, clipboard, stale revision and editor initialization (error boundary). A failed load is never replaced by a blank draft (E05).
+- Settings: versioned and validated through `SettingsRepository` and `chrome.storage.local`. New in this epic: preferences that cannot be read, from a newer schema or with storage failing, used to stop the app at "Open remaining drafts". The drafts now open with default preferences and a notice. The stored preferences are not overwritten, and Retry preferences reloads only the preferences, so unsaved editor content is kept (integration).
+
+Validation (2026-10-28):
+
+- Typecheck, lint and format checks passed.
+- 76 unit and integration tests passed.
+- Production build, manifest check and contrast measurement passed.
+- Playwright: 62 tests on installed Chrome and Edge passed in a full run. The new theme and output-mode tests were repeated 8 times on each browser.
+
+Not verified:
+
+- A brief default theme while the stored preference loads: the panel opens on "Opening your nook…" in the system theme, then applies a stored Light or Dark. It was not measured in the real side panel.
+- A screen reader walkthrough and a full keyboard-only journey by a person (TF-010 human checks; QA-004).
+- Real quota exhaustion; the quota path is covered by the error mapping, not by filling a disk.

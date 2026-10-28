@@ -897,3 +897,82 @@ test('returning from preview keeps the content, cursor, and scroll position', as
   await page.keyboard.type('X');
   await expect(editor.locator('p').nth(1)).toHaveText('LineX 2 of a long draft.');
 });
+
+test('theme follows the system by default, persists, and never interrupts editing', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.reload();
+  const theme = () => page.evaluate(() => document.documentElement.dataset.theme);
+  await expect.poll(theme).toBe('dark');
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect.poll(theme).toBe('light');
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await expect(editor).toBeFocused();
+  await page.keyboard.type('Half a thought');
+  await settled(editor, { text: '', from: 15 });
+  // A system change mid-sentence keeps focus, cursor and typing.
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect.poll(theme).toBe('dark');
+  await expect(editor).toBeFocused();
+  await page.keyboard.type(', finished.');
+  await expect(editor).toHaveText('Half a thought, finished.');
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'System', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByRole('button', { name: 'Light', exact: true }).click();
+  await expect.poll(theme).toBe('light');
+  await page.keyboard.press('Escape');
+  await expect(editor).toHaveText('Half a thought, finished.');
+  await editor.click();
+  await page.keyboard.press('End');
+  await page.keyboard.type(' Still here.');
+  await expect(editor).toHaveText('Half a thought, finished. Still here.');
+  await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
+  await page.reload();
+  // The stored choice wins over the dark system preference after a reload.
+  await expect(editor).toHaveText('Half a thought, finished. Still here.');
+  await expect.poll(theme).toBe('light');
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Light', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+});
+
+test('Unicode output is opt-in, warns once, persists, and leaves the draft unchanged', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Create first post' }).click();
+  const editor = page.getByRole('textbox', { name: 'Post content' });
+  await expect(editor).toBeFocused();
+  await editor.fill('Bold idea');
+  await editor.press('ControlOrMeta+a');
+  await editor.press('ControlOrMeta+b');
+  await expect(page.getByRole('status').filter({ hasText: 'Saved on this device' })).toBeVisible();
+  const mode = page.getByLabel('Output mode');
+  await expect(mode).toHaveValue('plain');
+  await expect(page.getByText('Plain text keeps your words easy to read.')).toBeVisible();
+  const before = await storedDraft(page);
+  // Declining the warning keeps plain text.
+  await mode.selectOption('unicode');
+  await expect(page.getByRole('dialog')).toHaveAccessibleName('A note about Unicode styling');
+  await page.getByRole('button', { name: 'Keep plain text', exact: true }).click();
+  await expect(mode).toHaveValue('plain');
+  await mode.selectOption('unicode');
+  await page.getByRole('button', { name: 'Use Unicode styling', exact: true }).click();
+  await expect(mode).toHaveValue('unicode');
+  await expect(page.getByText('Unicode styling may be harder to read or search.')).toBeVisible();
+  await mode.selectOption('plain');
+  // After the first acknowledgement the warning does not return.
+  await mode.selectOption('unicode');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(mode).toHaveValue('unicode');
+  await page.reload();
+  await expect(mode).toHaveValue('unicode');
+  await expect(editor.locator('strong')).toHaveText('Bold idea');
+  expect((await storedDraft(page)).content).toEqual(before.content);
+});

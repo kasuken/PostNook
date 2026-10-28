@@ -36,6 +36,8 @@ import { DraftList } from '../features/drafts/DraftList';
 const repository = new IndexedDraftRepository();
 const settingsRepository = new BrowserSettings();
 const clipboard = new BrowserClipboard();
+const settingsFailure = (e: unknown) =>
+  `${e instanceof Error ? e.message : 'Your preferences could not be read.'} Default preferences are used for now, and changes are not saved so the stored ones are kept. Your drafts are unaffected.`;
 type Dialog =
   | 'drafts'
   | 'settings'
@@ -70,11 +72,14 @@ export function App() {
   const [manualText, setManualText] = useState('');
   const [busy, setBusy] = useState(false);
   const settingsQueue = useRef(Promise.resolve());
+  const settingsReadOnly = useRef(false);
+  const [settingsError, setSettingsError] = useState('');
   const busyRef = useRef(false);
 
   const updateSettings = useCallback((next: Settings) => {
     settingsRef.current = next;
     setSettings(next);
+    if (settingsReadOnly.current) return;
     settingsQueue.current = settingsQueue.current
       .then(() => settingsRepository.save(next))
       .catch(() =>
@@ -110,10 +115,20 @@ export function App() {
       setBooting(true);
       setBootError('');
       try {
-        const preferences = await settingsRepository.load();
+        let preferences: Settings;
+        try {
+          preferences = await settingsRepository.load();
+          settingsReadOnly.current = false;
+          setSettingsError('');
+        } catch (e) {
+          // Unreadable preferences must not lock out the drafts, nor be overwritten.
+          preferences = { ...defaultSettings };
+          settingsReadOnly.current = true;
+          setSettingsError(settingsFailure(e));
+        }
         if (ignoreActive) {
           preferences.activeDraftId = null;
-          await settingsRepository.save(preferences);
+          if (!settingsReadOnly.current) await settingsRepository.save(preferences);
         }
         settingsRef.current = preferences;
         setSettings(preferences);
@@ -124,8 +139,10 @@ export function App() {
           : available[0];
         if (active) attach(active);
         if (isExtension()) {
-          const data = await chrome.storage.local.get('panelError');
-          setPanelError(typeof data.panelError === 'string' ? data.panelError : '');
+          const data = await chrome.storage.local.get('panelError').catch(() => ({}));
+          setPanelError(
+            'panelError' in data && typeof data.panelError === 'string' ? data.panelError : '',
+          );
         }
       } catch (e) {
         setBootError(e instanceof Error ? e.message : 'Your drafts could not be loaded.');
@@ -201,6 +218,17 @@ export function App() {
     } finally {
       busyRef.current = false;
       setBusy(false);
+    }
+  }
+  // Reloads only the preferences, so the open draft and its unsaved edits stay as they are.
+  async function retrySettings() {
+    try {
+      const stored = await settingsRepository.load();
+      settingsReadOnly.current = false;
+      setSettingsError('');
+      updateSettings({ ...stored, activeDraftId: settingsRef.current.activeDraftId });
+    } catch (e) {
+      setSettingsError(settingsFailure(e));
     }
   }
   // Saves the open draft before it is replaced; a failed save stops the action with a reason.
@@ -374,6 +402,21 @@ export function App() {
           }
         >
           {error}
+        </Notice>
+      )}
+      {settingsError && (
+        <Notice
+          actions={
+            <Button
+              onClick={() => {
+                void retrySettings();
+              }}
+            >
+              Retry preferences
+            </Button>
+          }
+        >
+          {settingsError}
         </Notice>
       )}
       {unreadable > 0 && (
